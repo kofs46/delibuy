@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeliBuy | Official Online Store</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#FF6B2C',
+              dark: '#0B0F19',
+              light: '#FFF5EB',
+              gray: '#1E293B',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased flex flex-col min-h-screen">
+
+  <!-- Top Announcement Bar -->
+  <div class="bg-brand-orange text-white text-xs py-2 px-4 text-center font-medium tracking-wide flex justify-center items-center gap-2">
+    <span>⚡ Fast delivery across all 64 districts in Bangladesh! Hotline: <strong>01516-597972</strong></span>
+  </div>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="sticky top-0 z-30 bg-[#0B0F19] text-white shadow-xl border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Brand Logo -->
+        <a href="#" onclick="selectCategory('all'); return false;" class="flex items-center">
+          <img src="delibuy-logo.jpeg" alt="DeliBuy Logo" class="h-12 sm:h-14 w-auto rounded-lg shadow-md border border-slate-800 object-cover">
+        </a>
+
+        <!-- Search Bar (Desktop) -->
+        <div class="hidden md:flex flex-1 max-w-md mx-8">
+          <div class="relative w-full">
+            <input type="text" id="searchInput" placeholder="Search products, brands and categories..." 
+              class="w-full bg-slate-900 border border-slate-700 text-white rounded-full py-2.5 pl-5 pr-12 focus:outline-none focus:border-brand-orange text-sm transition">
+            <button onclick="handleSearch()" class="absolute right-1.5 top-1.5 bg-brand-orange text-white w-8 h-8 rounded-full flex items-center justify-center hover:opacity-90 transition cursor-pointer">
+              <i class="fa-solid fa-magnifying-glass text-xs"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center space-x-3 sm:space-x-4">
+          <!-- Order Tracking -->
+          <button onclick="openTrackModal()" class="text-xs sm:text-sm font-semibold text-slate-300 hover:text-brand-orange transition flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800 cursor-pointer">
+            <i class="fa-solid fa-truck-fast text-brand-orange"></i>
+            <span class="hidden sm:inline">Track Order</span>
+          </button>
+
+          <!-- Shopping Cart Drawer Trigger -->
+          <button onclick="openCartDrawer()" class="relative p-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-full transition focus:outline-none cursor-pointer">
+            <i class="fa-solid fa-cart-shopping text-base text-brand-orange"></i>
+            <span id="cartCountBadge" class="cart-badge-count absolute -top-1 -right-1 bg-brand-orange text-white text-[11px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-[#0B0F19]">
+              0
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Search Bar -->
+      <div class="pb-3 md:hidden">
+        <div class="relative w-full">
+          <input type="text" id="mobileSearchInput" placeholder="Search products..." 
+            class="w-full bg-slate-900 border border-slate-700 text-white rounded-full py-2 pl-4 pr-10 text-xs focus:outline-none focus:border-brand-orange">
+          <button onclick="handleMobileSearch()" class="absolute right-2 top-2 text-brand-orange p-1">
+            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HERO BANNER ================= -->
+  <section class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white py-12 px-4 sm:px-6 relative overflow-hidden border-b border-slate-800">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+      <div class="md:w-1/2 space-y-4 text-center md:text-left">
+        <span class="inline-block bg-brand-orange/20 text-brand-orange border border-brand-orange/40 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+          🔥 Genuine Products & Best Deals
+        </span>
+        <h1 class="text-3xl sm:text-5xl font-extrabold leading-tight">
+          Reliable Online Shopping at <span class="text-brand-orange">DeliBuy</span>
+        </h1>
+        <p class="text-slate-400 text-sm sm:text-base max-w-lg">
+          Secure order booking with advance shipping fee via bKash. Pay the rest with Cash on Delivery at your doorstep.
+        </p>
+        <div>
+          <a href="#catalog-section" class="inline-flex items-center gap-2 bg-brand-orange text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-orange-600 transition">
+            Start Shopping <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+      <div class="md:w-1/2 flex justify-center">
+        <div class="relative p-3 bg-slate-800/80 rounded-2xl border border-slate-700 shadow-2xl backdrop-blur-sm">
+          <img src="delibuy-logo.jpeg" alt="DeliBuy" class="rounded-xl w-64 sm:w-80 object-cover shadow-inner">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CATALOG SECTION ================= -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full" id="catalog-section">
+    
+    <!-- Dynamic Categories Bar -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-layer-group text-brand-orange"></i> Categories
+        </h2>
+        <span class="text-xs text-slate-500 font-medium">Browse by category</span>
+      </div>
+      <div id="categoryContainer" class="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+
+    <!-- Filter Title & Counters -->
+    <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-6">
+      <h3 id="currentCategoryTitle" class="text-lg font-bold text-slate-800">All Products</h3>
+      <span id="productCountBadge" class="text-xs font-semibold bg-slate-200 text-slate-700 px-2.5 py-1 rounded-full">
+        0 products
+      </span>
+    </div>
+
+    <!-- Products Grid -->
+    <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+      <!-- Injected via JavaScript -->
+    </div>
+
+  </main>
+
+  <!-- ================= PRODUCT DETAILS MODAL (MULTIPLE IMAGES + INTERACTIVE ZOOM) ================= -->
+  <div id="productModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-4xl w-full overflow-hidden shadow-2xl relative flex flex-col md:flex-row max-h-[90vh]">
+      
+      <!-- Close Button -->
+      <button onclick="closeProductModal()" class="absolute top-4 right-4 z-20 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full w-9 h-9 flex items-center justify-center transition cursor-pointer">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <!-- Left: Gallery & Zoom Area -->
+      <div class="md:w-1/2 bg-slate-50 p-5 flex flex-col justify-between items-center border-b md:border-b-0 md:border-r border-slate-200">
+        <div class="relative w-full h-64 sm:h-80 flex items-center justify-center bg-white rounded-2xl border border-slate-200 overflow-hidden cursor-zoom-in group shadow-inner" id="zoomContainer">
+          <img id="modalMainImg" src="" alt="Product" class="max-h-full max-w-full object-contain transition-transform duration-150 pointer-events-none">
+          <span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-2 py-1 rounded-md pointer-events-none">
+            <i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Hover to Zoom
+          </span>
+        </div>
+
+        <!-- Thumbnails Strip -->
+        <div id="modalThumbnails" class="flex gap-2.5 mt-4 overflow-x-auto w-full py-1 justify-center scrollbar-none">
+          <!-- Thumbnail buttons injected via JS -->
+        </div>
+      </div>
+
+      <!-- Right: Detailed Specifications -->
+      <div class="md:w-1/2 p-6 flex flex-col justify-between overflow-y-auto">
+        <div>
+          <span id="modalCategoryBadge" class="inline-block bg-orange-100 text-brand-orange text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider mb-2"></span>
+          <h2 id="modalTitle" class="text-xl font-black text-slate-900 leading-snug mb-2"></h2>
+
+          <!-- Pricing Display -->
+          <div class="flex items-baseline gap-3 my-3">
+            <span id="modalDiscountPrice" class="text-2xl font-black text-brand-orange"></span>
+            <span id="modalOriginalPrice" class="text-sm line-through text-slate-400 font-semibold"></span>
+            <span id="modalDiscountPercent" class="text-xs font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded"></span>
+          </div>
+
+          <!-- Stock Indicator -->
+          <div id="modalStockStatus" class="mb-4"></div>
+
+          <div class="border-t border-slate-100 pt-3">
+            <h4 class="text-xs font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Product Overview</h4>
+            <p id="modalDescription" class="text-slate-600 text-xs sm:text-sm leading-relaxed whitespace-pre-line"></p>
+          </div>
+        </div>
+
+        <!-- Controls (Qty + Add to Cart) -->
+        <div class="space-y-4 pt-6 border-t border-slate-100 mt-4">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-slate-700 uppercase">Quantity:</label>
+            <div class="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
+              <button onclick="adjustModalQty(-1)" class="px-3.5 py-1.5 hover:bg-slate-200 text-slate-700 font-black cursor-pointer">-</button>
+              <span id="modalQtyVal" class="px-4 py-1 text-xs font-black text-slate-900">1</span>
+              <button onclick="adjustModalQty(1)" class="px-3.5 py-1.5 hover:bg-slate-200 text-slate-700 font-black cursor-pointer">+</button>
+            </div>
+          </div>
+
+          <button id="modalAddToCartBtn" onclick="addModalProductToCart()" class="w-full bg-[#0B0F19] hover:bg-brand-orange text-white font-bold py-3.5 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-lg cursor-pointer">
+            <i class="fa-solid fa-cart-plus"></i>
+            <span>Add to Cart</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CART BACKDROP & DRAWER ================= -->
+  <div id="cartBackdrop" onclick="closeCartDrawer()" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-40 hidden transition-opacity duration-300"></div>
+
+  <div id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+    <div class="p-4 bg-[#0B0F19] text-white flex items-center justify-between">
+      <div class="flex items-center gap-2 font-bold text-sm tracking-wide">
+        <i class="fa-solid fa-bag-shopping text-brand-orange text-base"></i>
+        <span>Shopping Cart</span>
+      </div>
+      <button onclick="closeCartDrawer()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition cursor-pointer">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <div id="cartItemsList" class="flex-1 overflow-y-auto p-4 space-y-3">
+      <!-- Injected via JavaScript -->
+    </div>
+
+    <div class="p-4 border-t border-slate-200 bg-slate-50 space-y-3">
+      <div class="flex justify-between items-center text-sm font-semibold">
+        <span class="text-slate-600">Items Subtotal:</span>
+        <span id="cartSubtotal" class="text-lg font-black text-slate-900">৳ 0</span>
+      </div>
+      <button onclick="openCheckoutModal()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2 cursor-pointer">
+        <span>Proceed to Checkout</span>
+        <i class="fa-solid fa-arrow-right text-xs"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= CHECKOUT MODAL ================= -->
+  <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl max-h-[95vh] flex flex-col">
+      <div class="p-5 bg-[#0B0F19] text-white flex justify-between items-center">
+        <div>
+          <h3 class="text-lg font-bold flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-brand-orange"></i> Complete Your Order
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Pay delivery charge in advance & book with Cash on Delivery</p>
+        </div>
+        <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-white cursor-pointer">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <form id="checkoutForm" onsubmit="handlePlaceOrder(event)" class="p-6 overflow-y-auto space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Full Name *</label>
+          <input type="text" id="custName" required placeholder="e.g. Tanvir Hasan"
+            class="w-full border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-orange">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Contact Phone Number *</label>
+          <input type="tel" id="custPhone" required placeholder="01XXXXXXXXX"
+            class="w-full border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-orange">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Full Delivery Address *</label>
+          <textarea id="custAddress" required rows="2" placeholder="House, Road, Thana, District..."
+            class="w-full border border-slate-300 rounded-lg px-3.5 py-2 text-sm focus:outline-none focus:border-brand-orange"></textarea>
+        </div>
+
+        <div class="border-t border-slate-200 pt-3">
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Step 1: Select Delivery Location *</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center gap-3 p-3.5 border rounded-xl cursor-pointer hover:border-brand-orange transition">
+              <input type="radio" name="deliveryLocation" value="inside" checked onchange="setDeliveryLocation('inside')" class="accent-brand-orange h-4 w-4">
+              <div>
+                <p class="text-sm font-bold text-slate-800">Inside Dhaka</p>
+                <p class="text-xs text-brand-orange font-semibold">Fee: ৳ 60</p>
+              </div>
+            </label>
+
+            <label class="flex items-center gap-3 p-3.5 border rounded-xl cursor-pointer hover:border-brand-orange transition">
+              <input type="radio" name="deliveryLocation" value="outside" onchange="setDeliveryLocation('outside')" class="accent-brand-orange h-4 w-4">
+              <div>
+                <p class="text-sm font-bold text-slate-800">Outside Dhaka</p>
+                <p class="text-xs text-brand-orange font-semibold">Fee: ৳ 120</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-200 pt-3">
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-2">
+            Step 2: Pay Delivery Charge via bKash (Required to Book) *
+          </label>
+
+          <div class="p-4 bg-pink-50 border border-pink-200 rounded-xl space-y-3">
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded-lg bg-[#E2136E] text-white flex items-center justify-center font-black text-xs shrink-0 mt-0.5">
+                bKash
+              </div>
+              <div class="text-xs text-slate-700 space-y-1">
+                <p>
+                  Please <strong>Send Money</strong> of <span id="checkoutAdvanceAmount" class="font-extrabold text-[#E2136E] text-sm">৳ 60</span> to our official bKash number:
+                </p>
+                <p class="text-base font-black text-pink-700 select-all tracking-wider flex items-center gap-2">
+                  <i class="fa-solid fa-mobile-screen-button"></i>
+                  <span id="checkoutBkashTarget">01516-597972</span>
+                  <span class="text-[10px] font-normal bg-pink-200 text-pink-800 px-2 py-0.5 rounded-full">Personal</span>
+                </p>
+                <p class="text-[11px] text-slate-500">
+                  <i class="fa-solid fa-circle-info text-[#E2136E]"></i> The remaining product price will be collected as <strong>Cash on Delivery (COD)</strong> when you receive your parcel.
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-pink-200/80">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Your bKash Number (Sender) *</label>
+                <input type="tel" id="bkashSenderPhone" required placeholder="01XXXXXXXXX"
+                  class="w-full bg-white border border-pink-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#E2136E]">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">bKash Transaction ID (TrxID) *</label>
+                <input type="text" id="bkashTrxId" required placeholder="e.g. BL92KA87P"
+                  class="w-full bg-white border border-pink-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#E2136E] uppercase font-mono">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 text-xs">
+          <div class="flex justify-between text-slate-600">
+            <span>Products Subtotal:</span>
+            <span id="checkoutSubtotal" class="font-bold text-slate-800">৳ 0</span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Delivery Fee:</span>
+            <span id="checkoutDeliveryFee" class="font-bold text-slate-800">৳ 60</span>
+          </div>
+          <div class="flex justify-between text-slate-700 font-bold px-1 border-t border-slate-200 pt-2">
+            <span>Due on Delivery (Cash on Delivery):</span>
+            <span id="checkoutCodPayable" class="text-slate-900 font-black">৳ 0</span>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-black py-3.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-circle-check"></i> Submit & Confirm Order
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= ORDER SUCCESS MODAL ================= -->
+  <div id="successModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl space-y-5 transform transition-all">
+      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl shadow-inner">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+
+      <div>
+        <h3 class="text-2xl font-black text-slate-900">Order Confirmed!</h3>
+        <p class="text-slate-500 text-xs mt-1">ধন্যবাদ <strong id="successCustomerName" class="text-slate-800"></strong>! আপনার অর্ডার ও ডেলিভারি চার্জ পেমেন্ট সফলভাবে রিসিভ হয়েছে।</p>
+      </div>
+
+      <div class="bg-slate-50 p-4 rounded-2xl border border-dashed border-slate-300">
+        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Your Order Tracking ID</span>
+        <p id="successOrderId" class="text-2xl font-black text-brand-orange tracking-wider font-mono select-all"></p>
+        <button onclick="copySuccessOrderId()" class="mt-2 text-xs text-slate-600 hover:text-brand-orange font-bold inline-flex items-center gap-1.5 transition cursor-pointer">
+          <i class="fa-regular fa-copy"></i> Copy Order ID
+        </button>
+      </div>
+
+      <div class="text-[11px] text-slate-500 text-left bg-orange-50/60 p-3 rounded-xl border border-orange-100 space-y-1">
+        <p>• <strong>Payment:</strong> ডেলিভারি চার্জ bKash-এ পরিশোধিত</p>
+        <p>• <strong>Cash on Delivery:</strong> বাকি মূল্য পার্সেল হাতে পেয়ে পরিশোধ করুন</p>
+      </div>
+
+      <div class="flex gap-2.5 pt-2">
+        <button onclick="trackFromSuccess()" class="flex-1 bg-[#0B0F19] text-white py-3 rounded-xl font-bold text-xs hover:bg-slate-800 transition shadow cursor-pointer">
+          <i class="fa-solid fa-truck-fast text-brand-orange mr-1"></i> Track Order
+        </button>
+        <button onclick="closeSuccessModal()" class="flex-1 bg-brand-orange text-white py-3 rounded-xl font-bold text-xs hover:bg-orange-600 transition shadow cursor-pointer">
+          Continue Shopping
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TRACK ORDER MODAL ================= -->
+  <div id="trackModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-truck-ramp-box text-brand-orange"></i> Track Order Status
+        </h3>
+        <button onclick="closeTrackModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div class="flex gap-2">
+          <input type="text" id="trackInput" placeholder="Enter Order ID (e.g. DB-102938) or Phone"
+            class="flex-1 border border-slate-300 rounded-lg px-3.5 py-2 text-sm focus:outline-none focus:border-brand-orange">
+          <button onclick="handleTrackSearch()" class="bg-brand-orange hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition cursor-pointer">
+            Track
+          </button>
+        </div>
+
+        <div id="trackResultContainer" class="hidden mt-4 pt-4 border-t border-slate-100">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-[#0B0F19] text-slate-400 border-t border-slate-800 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="space-y-4">
+          <img src="delibuy-logo.jpeg" alt="DeliBuy" class="h-14 w-auto rounded-lg border border-slate-800">
+          <p class="text-xs text-slate-400 leading-relaxed">
+            DeliBuy delivers curated lifestyle and tech gear nationwide with authentic service and verified payments.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-brand-orange pl-2">Navigation</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#" onclick="selectCategory('all'); return false;" class="hover:text-brand-orange transition">All Products</a></li>
+            <li><a href="#" onclick="openTrackModal(); return false;" class="hover:text-brand-orange transition">Track Order</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-brand-orange pl-2">Payment Policy</h4>
+          <div class="space-y-2 text-xs">
+            <div class="flex flex-wrap gap-2">
+              <span class="bg-[#E2136E] text-white px-2.5 py-1 rounded font-bold">bKash (Advance Fee)</span>
+              <span class="bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-slate-700">COD (Product Price)</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-brand-orange pl-2">Contact Us</h4>
+          <ul class="space-y-2.5 text-xs text-slate-400">
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-location-dot text-brand-orange mt-0.5"></i>
+              <span>Bank Town, Savar, Dhaka, Bangladesh, 1347</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-phone text-brand-orange"></i>
+              <a href="tel:01516597972" class="hover:text-white">01516-597972</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

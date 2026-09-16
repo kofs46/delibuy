@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeliBuy | Admin Operations Center</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#FF6B2C',
+              dark: '#0B0F19',
+              light: '#FFF5EB',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased flex min-h-screen">
+
+  <!-- ================= LOGIN OVERLAY ================= -->
+  <div id="adminLoginOverlay" class="fixed inset-0 z-50 bg-[#0B0F19] flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl space-y-6">
+      <div class="text-center space-y-2">
+        <img src="delibuy-logo.jpeg" alt="DeliBuy" class="h-12 mx-auto rounded border border-slate-700 object-cover">
+        <h2 class="text-xl font-black text-slate-900">DeliBuy Staff Portal</h2>
+        <p class="text-xs text-slate-500">Sign in with your assigned admin credentials</p>
+      </div>
+
+      <form onsubmit="handleAdminLogin(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Username</label>
+          <input type="text" id="loginUsername" required placeholder="Enter username" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:border-brand-orange">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Password</label>
+          <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:border-brand-orange">
+        </div>
+
+        <button type="submit" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-black py-3 rounded-xl transition shadow-lg text-sm">
+          Authenticate & Access
+        </button>
+      </form>
+
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center text-[11px] text-slate-500">
+        <p>Default Master: <code class="text-slate-800 font-bold">admin</code> | Pass: <code class="text-slate-800 font-bold">delibuy123</code></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="w-64 bg-[#0B0F19] text-white flex flex-col justify-between hidden md:flex border-r border-slate-800 shrink-0">
+    <div>
+      <div class="p-5 border-b border-slate-800 flex items-center gap-3">
+        <img src="delibuy-logo.jpeg" alt="Logo" class="h-10 w-auto rounded border border-slate-700 object-cover">
+        <div>
+          <h2 class="font-extrabold text-sm tracking-wide">DeliBuy Ops</h2>
+          <span id="sidebarRoleBadge" class="text-[10px] text-brand-orange font-bold uppercase tracking-wider">
+            Super Admin
+          </span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs (Dynamically Restricted by Role) -->
+      <nav class="p-4 space-y-1.5 text-xs font-bold">
+        <button onclick="switchTab('dashboardTab')" id="nav-dashboardTab" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 bg-brand-orange text-white transition">
+          <i class="fa-solid fa-chart-pie text-base"></i> Orders Dashboard
+        </button>
+        <button onclick="switchTab('productsTab')" id="nav-productsTab" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 text-slate-400 hover:bg-slate-900 hover:text-white transition">
+          <i class="fa-solid fa-boxes-stacked text-base"></i> Product Catalog
+        </button>
+        <button onclick="switchTab('categoriesTab')" id="nav-categoriesTab" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 text-slate-400 hover:bg-slate-900 hover:text-white transition">
+          <i class="fa-solid fa-layer-group text-base"></i> Categories
+        </button>
+        <button onclick="switchTab('teamTab')" id="nav-teamTab" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 text-slate-400 hover:bg-slate-900 hover:text-white transition">
+          <i class="fa-solid fa-users-gear text-base"></i> Admin & Roles
+        </button>
+        <button onclick="switchTab('settingsTab')" id="nav-settingsTab" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 text-slate-400 hover:bg-slate-900 hover:text-white transition">
+          <i class="fa-solid fa-sliders text-base"></i> Store Settings
+        </button>
+      </nav>
+    </div>
+
+    <div class="p-4 border-t border-slate-800 space-y-2">
+      <button onclick="handleAdminLogout()" class="w-full bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+      <a href="index.html" target="_blank" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-slate-700 transition">
+        <i class="fa-solid fa-arrow-up-right-from-square text-brand-orange"></i> Customer Shop
+      </a>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-30 shadow-sm">
+      <h1 id="pageTitle" class="text-xl font-black text-slate-900">Orders Dashboard</h1>
+      <div class="flex items-center gap-3">
+        <span id="headerUserGreeting" class="text-xs text-slate-600 font-bold bg-slate-100 px-3 py-1 rounded-full border">
+          Logged in as: <strong>Admin</strong>
+        </span>
+        <button onclick="handleAdminLogout()" class="md:hidden text-xs bg-red-100 text-red-600 px-3 py-1.5 rounded-lg font-bold">Logout</button>
+      </div>
+    </header>
+
+    <main class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
+
+      <!-- ================= TAB 1: DASHBOARD & ORDERS ================= -->
+      <section id="dashboardTab" class="admin-tab space-y-6">
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div onclick="filterOrdersByStatus('Order Placed')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-orange transition">
+            <span class="text-xs font-bold text-slate-400 uppercase">New Orders</span>
+            <p id="statNewOrders" class="text-2xl font-black text-slate-900 mt-2">0</p>
+            <span class="text-[10px] text-amber-600 font-bold">Needs Confirmation</span>
+          </div>
+
+          <div onclick="filterOrdersByStatus('Confirmed Order')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-orange transition">
+            <span class="text-xs font-bold text-slate-400 uppercase">Confirmed</span>
+            <p id="statConfirmedOrders" class="text-2xl font-black text-slate-900 mt-2">0</p>
+            <span class="text-[10px] text-blue-600 font-bold">Ready to Shift</span>
+          </div>
+
+          <div onclick="filterOrdersByStatus('Shifted')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-orange transition">
+            <span class="text-xs font-bold text-slate-400 uppercase">Shifted</span>
+            <p id="statShiftedOrders" class="text-2xl font-black text-slate-900 mt-2">0</p>
+            <span class="text-[10px] text-purple-600 font-bold">In Courier</span>
+          </div>
+
+          <div onclick="filterOrdersByStatus('Delivered')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-orange transition">
+            <span class="text-xs font-bold text-slate-400 uppercase">Delivered</span>
+            <p id="statDeliveredOrders" class="text-2xl font-black text-slate-900 mt-2">0</p>
+            <span class="text-[10px] text-green-600 font-bold">Completed</span>
+          </div>
+
+          <div onclick="filterOrdersByStatus('Cancelled')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-orange transition col-span-2 lg:col-span-1">
+            <span class="text-xs font-bold text-slate-400 uppercase">Cancelled</span>
+            <p id="statCancelledOrders" class="text-2xl font-black text-slate-900 mt-2">0</p>
+            <span class="text-[10px] text-red-500 font-bold">Rejected</span>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-magnifying-glass text-brand-orange"></i> Search Orders
+            </h2>
+            <div class="flex flex-wrap gap-1.5" id="orderFilterPills">
+              <button onclick="filterOrdersByStatus('All')" class="filter-pill active px-3 py-1 rounded-lg text-xs font-bold border border-slate-800 bg-[#0B0F19] text-white">All</button>
+              <button onclick="filterOrdersByStatus('Order Placed')" class="filter-pill px-3 py-1 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">New</button>
+              <button onclick="filterOrdersByStatus('Confirmed Order')" class="filter-pill px-3 py-1 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">Confirmed</button>
+              <button onclick="filterOrdersByStatus('Shifted')" class="filter-pill px-3 py-1 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">Shifted</button>
+              <button onclick="filterOrdersByStatus('Delivered')" class="filter-pill px-3 py-1 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">Delivered</button>
+            </div>
+          </div>
+          <input type="text" id="orderSearchInput" oninput="handleOrderSearchLive()" placeholder="Search by Order ID or Phone Number..."
+            class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-brand-orange">
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="font-bold text-sm text-slate-800">Order Queue</h3>
+            <span id="orderTableCount" class="text-xs bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full font-bold">0 records</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-slate-50 text-slate-500 font-bold border-b">
+                <tr>
+                  <th class="p-3.5">Order ID</th>
+                  <th class="p-3.5">Customer</th>
+                  <th class="p-3.5">bKash Trx</th>
+                  <th class="p-3.5">COD Collectible</th>
+                  <th class="p-3.5">Status</th>
+                  <th class="p-3.5 text-center">Action</th>
+                  <th class="p-3.5 text-right">Details</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 2: PRODUCTS ================= -->
+      <section id="productsTab" class="admin-tab hidden space-y-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-plus-circle text-brand-orange"></i> Add New Product
+          </h2>
+
+          <form id="addProductForm" onsubmit="handleCreateProduct(event)" class="space-y-4 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Product Title *</label>
+                <input type="text" id="prodTitle" required class="w-full border rounded-lg p-2.5">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Category *</label>
+                <select id="prodCategorySelect" required class="w-full border rounded-lg p-2.5 bg-white"></select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Regular Price (৳) *</label>
+                <input type="number" id="prodOriginalPrice" oninput="calculateDiscountPrice()" required min="1" class="w-full bg-white border rounded-lg p-2.5">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Discount % (Optional)</label>
+                <input type="number" id="prodDiscountPercent" oninput="calculateDiscountPrice()" min="0" max="99" class="w-full bg-white border rounded-lg p-2.5">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Sale Price (৳) *</label>
+                <input type="number" id="prodDiscountPrice" required min="1" class="w-full bg-slate-100 border font-bold text-brand-orange rounded-lg p-2.5">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Initial Stock Quantity *</label>
+                <input type="number" id="prodStock" required min="0" class="w-full border rounded-lg p-2.5">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Direct Photo Upload (Single/Multiple) *</label>
+                <div onclick="document.getElementById('prodFileInput').click()" class="border-2 border-dashed border-slate-300 hover:border-brand-orange bg-slate-50 p-4 rounded-xl text-center cursor-pointer transition">
+                  <input type="file" id="prodFileInput" multiple accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                  <p class="text-xs font-bold text-slate-700">Click to choose photos from device</p>
+                </div>
+              </div>
+            </div>
+
+            <div id="imagePreviewContainer" class="flex flex-wrap gap-2.5 empty:hidden pt-1"></div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Product Details & Specs *</label>
+              <textarea id="prodDescription" rows="3" required class="w-full border rounded-lg p-2.5"></textarea>
+            </div>
+
+            <button type="submit" class="bg-brand-orange hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-xl transition shadow-md">
+              Publish Product
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="font-bold text-sm text-slate-800">Inventory Items</h3>
+            <span id="adminProdCountBadge" class="text-xs bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full font-bold">0 products</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-slate-50 text-slate-500 font-bold border-b">
+                <tr>
+                  <th class="p-3.5">Image</th>
+                  <th class="p-3.5">Product</th>
+                  <th class="p-3.5">Category</th>
+                  <th class="p-3.5">Price</th>
+                  <th class="p-3.5">Stock</th>
+                  <th class="p-3.5 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminProductsTableBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 3: CATEGORIES ================= -->
+      <section id="categoriesTab" class="admin-tab hidden space-y-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-layer-group text-brand-orange"></i> Add New Category
+          </h2>
+          <form id="addCategoryForm" onsubmit="handleCreateCategory(event)" class="flex flex-col sm:flex-row gap-3 text-xs">
+            <input type="text" id="newCatName" required placeholder="Category Title" class="flex-1 border rounded-lg p-2.5">
+            <input type="text" id="newCatId" required placeholder="Unique ID (e.g. watch)" class="w-full sm:w-48 border rounded-lg p-2.5 font-mono">
+            <button type="submit" class="bg-brand-orange hover:bg-orange-600 text-white font-bold py-2.5 px-6 rounded-xl transition shrink-0">
+              Create Category
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+          <h3 class="font-bold text-sm text-slate-800 mb-3">Active Categories</h3>
+          <div id="adminCategoryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 4: ADMINS, ROLES & PASSWORD CHANGE ================= -->
+      <section id="teamTab" class="admin-tab hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- Card 1: Change My Credentials -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-key text-brand-orange"></i> Change My Password & Username
+            </h2>
+            <form onsubmit="handleChangeOwnCredentials(event)" class="space-y-3 text-xs">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">New Username</label>
+                <input type="text" id="changeUsername" required class="w-full border rounded-lg p-2.5">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Current Password (For Verification)</label>
+                <input type="password" id="currentPassword" required class="w-full border rounded-lg p-2.5">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">New Password</label>
+                <input type="password" id="newPassword" required minlength="6" class="w-full border rounded-lg p-2.5">
+              </div>
+              <button type="submit" class="bg-slate-900 hover:bg-black text-white font-bold py-2.5 px-5 rounded-xl transition">
+                Update My Credentials
+              </button>
+            </form>
+          </div>
+
+          <!-- Card 2: Create New Admin with Role -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-user-plus text-brand-orange"></i> Add New Staff / Admin
+            </h2>
+            <form onsubmit="handleCreateNewAdmin(event)" class="space-y-3 text-xs">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Staff Full Name</label>
+                  <input type="text" id="newStaffName" required placeholder="e.g. Rahim Ahmed" class="w-full border rounded-lg p-2.5">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Staff Username</label>
+                  <input type="text" id="newStaffUsername" required placeholder="rahim_ops" class="w-full border rounded-lg p-2.5">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Temporary Password</label>
+                  <input type="password" id="newStaffPassword" required minlength="6" class="w-full border rounded-lg p-2.5">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Assigned Job / Role *</label>
+                  <select id="newStaffRole" required class="w-full border rounded-lg p-2.5 bg-white font-bold text-slate-800">
+                    <option value="Super Admin">Super Admin (Full Access)</option>
+                    <option value="Order Manager">Order Manager (Orders Only)</option>
+                    <option value="Product Manager">Product Manager (Products Only)</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" class="bg-brand-orange hover:bg-orange-600 text-white font-bold py-2.5 px-5 rounded-xl transition">
+                Create Admin Account
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- Admins Table List -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="font-bold text-sm text-slate-800">Authorized Admin Accounts</h3>
+            <span id="adminAccountsCount" class="text-xs bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full font-bold">1 accounts</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-slate-50 text-slate-500 font-bold border-b">
+                <tr>
+                  <th class="p-3.5">Name</th>
+                  <th class="p-3.5">Username</th>
+                  <th class="p-3.5">Role / Assigned Job</th>
+                  <th class="p-3.5 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminsTableBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB 5: SETTINGS ================= -->
+      <section id="settingsTab" class="admin-tab hidden space-y-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-2xl">
+          <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-brand-orange"></i> Shipping Charges & bKash Setup
+          </h2>
+          <form id="settingsForm" onsubmit="handleSaveSettings(event)" class="space-y-4 text-xs">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Official bKash Number (Advance Fee Receiver) *</label>
+              <input type="text" id="settingBkashNumber" required class="w-full border rounded-lg p-2.5 font-mono font-bold text-[#E2136E]">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Inside Dhaka Delivery Fee (৳) *</label>
+                <input type="number" id="settingInsideFee" required min="0" class="w-full border rounded-lg p-2.5 font-bold">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Outside Dhaka Delivery Fee (৳) *</label>
+                <input type="number" id="settingOutsideFee" required min="0" class="w-full border rounded-lg p-2.5 font-bold">
+              </div>
+            </div>
+            <button type="submit" class="bg-brand-orange hover:bg-orange-600 text-white font-bold py-2.5 px-6 rounded-xl transition">
+              Save Store Settings
+            </button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Order Inspection Modal -->
+  <div id="orderDetailModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl max-h-[92vh] flex flex-col">
+      <div class="p-5 bg-[#0B0F19] text-white flex justify-between items-center">
+        <h3 class="text-base font-bold flex items-center gap-2">
+          <i class="fa-solid fa-file-invoice text-brand-orange"></i> Order Details: <span id="modalOrderIdTitle" class="text-brand-orange font-mono"></span>
+        </h3>
+        <button onclick="closeOrderDetailModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      <div class="p-6 overflow-y-auto space-y-5 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Customer Info</span>
+            <p id="modalCustName" class="font-bold text-slate-800 text-sm mt-0.5"></p>
+            <p id="modalCustPhone" class="text-slate-600 font-medium"></p>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Delivery Location</span>
+            <p id="modalLocationBadge" class="font-bold text-brand-orange"></p>
+            <p id="modalCustAddress" class="text-slate-600 whitespace-pre-line"></p>
+          </div>
+        </div>
+
+        <div class="p-4 bg-pink-50 border border-pink-200 rounded-xl space-y-1">
+          <p class="font-bold text-pink-900"><i class="fa-solid fa-shield-check text-[#E2136E]"></i> Advance bKash Delivery Charge</p>
+          <p class="text-slate-700">Sender Number: <strong id="modalBkashSender" class="font-mono"></strong></p>
+          <p class="text-slate-700">Transaction ID (TrxID): <strong id="modalBkashTrx" class="font-mono text-[#E2136E] text-sm"></strong></p>
+        </div>
+
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase">Items Purchased</span>
+          <div id="modalItemsList" class="mt-2 divide-y divide-slate-100 border rounded-xl overflow-hidden"></div>
+        </div>
+
+        <div class="bg-slate-50 p-4 rounded-xl border space-y-1 font-semibold text-slate-600">
+          <div class="flex justify-between"><span>Items Subtotal:</span><span id="modalBillSubtotal"></span></div>
+          <div class="flex justify-between"><span>Advance Shipping Paid:</span><span id="modalBillShipping"></span></div>
+          <div class="border-t pt-2 flex justify-between font-black text-sm text-slate-900">
+            <span>Collectible COD Balance:</span><span id="modalBillCod" class="text-brand-orange"></span>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-between gap-2" id="modalActionButtons"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

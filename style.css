@@ -1,0 +1,66 @@
+/* DeliBuy Official Stylesheet */
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar for category bar & thumbnails */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Card hover smooth animation */
+.product-card {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 28px -10px rgba(11, 15, 25, 0.12);
+}
+
+/* Product Detail Zoom Effect */
+#zoomContainer {
+  position: relative;
+  overflow: hidden;
+}
+
+#modalMainImg {
+  transform-origin: center center;
+  transition: transform 0.15s ease-out;
+}
+
+/* Tracking Step Active Indicator */
+.track-step-active {
+  box-shadow: 0 0 0 4px rgba(255, 107, 44, 0.25);
+}
+
+/* Modal Fade-In Animation */
+@keyframes modalPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+#productModal > div,
+#checkoutModal > div,
+#successModal > div,
+#trackModal > div {
+  animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom Selection Color */
+::selection {
+  background-color: #FF6B2C;
+  color: #ffffff;
+}
