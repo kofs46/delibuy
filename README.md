@@ -7,8 +7,6 @@ DeliBuy is a complete, production-ready online shopping web application built wi
 ## 🌐 Live Demos
 
 - 🛒 **Customer Storefront:** [https://delibuy.netlify.app](https://delibuy.netlify.app)
-- 🔐 **Admin Operations Center:** [https://delibuy.netlify.app/admin.html](https://delibuy.netlify.app/admin.html)
-
 ---
 
 ## ✨ Key Features
