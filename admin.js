@@ -1,6 +1,7 @@
 /**
- * DeliBuy Operations & RBAC Controller (Connected to MongoDB Atlas)
- * Updated with Complete Product Edit, Invoice Print & Order State Workflows
+ * DeliBuy Operations & RBAC Controller
+ * Restricts UI by role, enables order cancellation at every stage until delivery,
+ * multiple image handling, and prints 4R clean courier parcel invoices (No bKash/TrxID).
  */
 
 const API_BASE = 'https://delibuy.onrender.com/api';
@@ -18,26 +19,55 @@ document.addEventListener('DOMContentLoaded', () => {
   checkAdminAuth();
 });
 
-// ================= AUTHENTICATION =================
+// ================= AUTHENTICATION & RBAC UI =================
 async function checkAdminAuth() {
   const sessionUser = sessionStorage.getItem('delibuy_logged_admin');
   const overlay = document.getElementById('adminLoginOverlay');
   if (sessionUser) {
     loggedAdmin = JSON.parse(sessionUser);
     if (overlay) overlay.classList.add('hidden');
-    applyAdminRoleUI();
+    applyRoleBasedPermissions();
     initializeData();
   } else {
     if (overlay) overlay.classList.remove('hidden');
   }
 }
 
-function applyAdminRoleUI() {
-  const greeting = document.getElementById('headerUserGreeting');
+function applyRoleBasedPermissions() {
+  if (!loggedAdmin) return;
+
+  const role = loggedAdmin.role || 'Super Admin';
   const roleBadge = document.getElementById('sidebarRoleBadge');
-  if (loggedAdmin) {
-    if (greeting) greeting.innerHTML = `Logged in as: <strong>${loggedAdmin.username}</strong>`;
-    if (roleBadge) roleBadge.innerText = loggedAdmin.role || 'Super Admin';
+  const greeting = document.getElementById('headerUserGreeting');
+
+  if (roleBadge) roleBadge.innerText = role;
+  if (greeting) greeting.innerHTML = `Logged in as: <strong>${loggedAdmin.username}</strong> (${role})`;
+
+  // Nav buttons
+  const navDash = document.getElementById('nav-dashboardTab');
+  const navProd = document.getElementById('nav-productsTab');
+  const navCat = document.getElementById('nav-categoriesTab');
+  const navTeam = document.getElementById('nav-teamTab');
+  const navSet = document.getElementById('nav-settingsTab');
+
+  // Role: Order Manager (Restricted to Orders Only)
+  if (role === 'Order Manager') {
+    if (navProd) navProd.classList.add('hidden');
+    if (navCat) navCat.classList.add('hidden');
+    if (navTeam) navTeam.classList.add('hidden');
+    if (navSet) navSet.classList.add('hidden');
+    switchTab('dashboardTab');
+  } 
+  // Role: Product Manager (Restricted to Catalog & Categories)
+  else if (role === 'Product Manager') {
+    if (navDash) navDash.classList.add('hidden');
+    if (navTeam) navTeam.classList.add('hidden');
+    if (navSet) navSet.classList.add('hidden');
+    switchTab('productsTab');
+  } 
+  // Role: Super Admin (Full Access)
+  else {
+    [navDash, navProd, navCat, navTeam, navSet].forEach(el => el && el.classList.remove('hidden'));
   }
 }
 
@@ -57,19 +87,18 @@ async function handleAdminLogin(e) {
       sessionStorage.setItem('delibuy_logged_admin', JSON.stringify(data.admin));
       loggedAdmin = data.admin;
       document.getElementById('adminLoginOverlay')?.classList.add('hidden');
-      applyAdminRoleUI();
+      applyRoleBasedPermissions();
       initializeData();
     } else {
-      // Fallback default master login check
       if (username === 'admin' && password === 'delibuy123') {
         const defaultAdmin = { username: 'admin', role: 'Super Admin' };
         sessionStorage.setItem('delibuy_logged_admin', JSON.stringify(defaultAdmin));
         loggedAdmin = defaultAdmin;
         document.getElementById('adminLoginOverlay')?.classList.add('hidden');
-        applyAdminRoleUI();
+        applyRoleBasedPermissions();
         initializeData();
       } else {
-        alert(data.error || 'Invalid Admin Credentials!');
+        alert(data.message || 'Invalid username or password!');
       }
     }
   } catch (err) {
@@ -78,10 +107,10 @@ async function handleAdminLogin(e) {
       sessionStorage.setItem('delibuy_logged_admin', JSON.stringify(defaultAdmin));
       loggedAdmin = defaultAdmin;
       document.getElementById('adminLoginOverlay')?.classList.add('hidden');
-      applyAdminRoleUI();
+      applyRoleBasedPermissions();
       initializeData();
     } else {
-      alert('Login error. Please verify backend connection.');
+      alert('Could not connect to backend server.');
     }
   }
 }
@@ -96,7 +125,6 @@ async function initializeData() {
   await Promise.all([loadOrders(), loadProducts(), loadCategories(), loadSettings(), loadAdminAccounts()]);
 }
 
-// ================= NAVIGATION =================
 function switchTab(tabId) {
   document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden'));
   document.querySelectorAll('.admin-nav-btn').forEach(b => {
@@ -113,17 +141,20 @@ function switchTab(tabId) {
   }
 
   const titles = {
-    dashboardTab: 'Orders Dashboard',
-    productsTab: 'Product Catalog & Inventory',
-    categoriesTab: 'Store Categories',
-    teamTab: 'Admin Accounts & Roles',
-    settingsTab: 'Store Settings'
+    dashboardTab: ['Orders Dashboard', 'Manage orders and dispatch lifecycle'],
+    productsTab: ['Product Catalog & Stock', 'Add, edit, upload photos and manage stock'],
+    categoriesTab: ['Store Categories', 'Create and organize storefront categories'],
+    teamTab: ['Admin & Staff Roles', 'Manage RBAC permissions and user credentials'],
+    settingsTab: ['Store Logistics & Payments', 'Configure bKash receiver and shipping rates']
   };
+
   const titleEl = document.getElementById('pageTitle');
-  if (titleEl) titleEl.innerText = titles[tabId] || 'Dashboard';
+  const subEl = document.getElementById('headerSubTitle');
+  if (titleEl && titles[tabId]) titleEl.innerText = titles[tabId][0];
+  if (subEl && titles[tabId]) subEl.innerText = titles[tabId][1];
 }
 
-// ================= ORDERS LOGIC =================
+// ================= ORDERS WITH CANCEL AT EVERY STAGE =================
 async function loadOrders() {
   try {
     const res = await fetch(`${API_BASE}/orders`);
@@ -197,13 +228,19 @@ function renderOrdersTable() {
         <p class="font-bold text-slate-800">${o.customer?.name || 'N/A'}</p>
         <p class="text-slate-400 text-[11px]">${o.customer?.phone || 'N/A'}</p>
       </td>
-      <td class="p-3.5 font-mono text-[#E2136E] font-bold">${o.advancePayment?.trxId || 'N/A'}</td>
+      <td class="p-3.5">
+        <p class="font-mono text-[#E2136E] font-bold text-[11px]">${o.advancePayment?.trxId || 'N/A'}</p>
+        <span class="text-slate-400 text-[10px]">From: ${o.advancePayment?.senderPhone || 'N/A'}</span>
+      </td>
       <td class="p-3.5 font-bold text-slate-900">৳ ${(o.payableOnDelivery || 0).toLocaleString()}</td>
       <td class="p-3.5"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${getOrderStatusBadge(o.status)}">${o.status}</span></td>
+      
+      <!-- CANCEL AVAILABLE AT EVERY STAGE UNTIL DELIVERED -->
       <td class="p-3.5 text-center">${getActionButtons(o)}</td>
+
       <td class="p-3.5 text-right">
         <button onclick="openOrderDetailModal('${o.orderId}')" class="bg-slate-900 hover:bg-brand-orange text-white px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer">
-          Details
+          Inspect
         </button>
       </td>
     </tr>
@@ -221,25 +258,37 @@ function getOrderStatusBadge(status) {
   }
 }
 
+// Generates buttons ensuring CANCEL is present at all stages prior to Delivery
 function getActionButtons(o) {
   if (o.status === 'Order Placed') {
     return `
       <div class="flex items-center justify-center gap-1.5">
         <button onclick="updateOrderStatus('${o.orderId}', 'Confirmed Order')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-md text-[10px] font-bold transition cursor-pointer">Confirm</button>
-        <button onclick="updateOrderStatus('${o.orderId}', 'Cancelled')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-md text-[10px] font-bold transition cursor-pointer">Cancel</button>
+        <button onclick="updateOrderStatus('${o.orderId}', 'Cancelled')" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded-md text-[10px] font-bold transition cursor-pointer">Cancel</button>
       </div>`;
   }
   if (o.status === 'Confirmed Order') {
-    return `<button onclick="updateOrderStatus('${o.orderId}', 'Shifted')" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-md text-[10px] font-bold transition cursor-pointer">Shift Parcel</button>`;
+    return `
+      <div class="flex items-center justify-center gap-1.5">
+        <button onclick="updateOrderStatus('${o.orderId}', 'Shifted')" class="bg-purple-600 hover:bg-purple-700 text-white px-2.5 py-1 rounded-md text-[10px] font-bold transition cursor-pointer">Shift Parcel</button>
+        <button onclick="updateOrderStatus('${o.orderId}', 'Cancelled')" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded-md text-[10px] font-bold transition cursor-pointer">Cancel</button>
+      </div>`;
   }
   if (o.status === 'Shifted') {
-    return `<button onclick="updateOrderStatus('${o.orderId}', 'Delivered')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-md text-[10px] font-bold transition cursor-pointer">Mark Delivered</button>`;
+    return `
+      <div class="flex items-center justify-center gap-1.5">
+        <button onclick="updateOrderStatus('${o.orderId}', 'Delivered')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-md text-[10px] font-bold transition cursor-pointer">Delivered</button>
+        <button onclick="updateOrderStatus('${o.orderId}', 'Cancelled')" class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded-md text-[10px] font-bold transition cursor-pointer">Cancel</button>
+      </div>`;
   }
-  return `<span class="text-slate-400 text-[11px]">—</span>`;
+  if (o.status === 'Cancelled') {
+    return `<span class="text-red-500 font-bold text-[11px]">Cancelled</span>`;
+  }
+  return `<span class="text-emerald-600 font-bold text-[11px]"><i class="fa-solid fa-check-double mr-1"></i> Completed</span>`;
 }
 
 async function updateOrderStatus(orderId, newStatus) {
-  if (!confirm(`Change order status to "${newStatus}"?`)) return;
+  if (!confirm(`Are you sure you want to change this order status to "${newStatus}"?`)) return;
   try {
     const res = await fetch(`${API_BASE}/orders/${orderId}/status`, {
       method: 'PUT',
@@ -274,7 +323,7 @@ function openOrderDetailModal(orderId) {
   document.getElementById('modalBkashTrx').innerText = o.advancePayment?.trxId || 'N/A';
 
   document.getElementById('modalBillSubtotal').innerText = `৳ ${(o.payableOnDelivery || 0).toLocaleString()}`;
-  document.getElementById('modalBillShipping').innerText = `৳ ${(o.deliveryFee || 0).toLocaleString()} (PAID via bKash)`;
+  document.getElementById('modalBillShipping').innerText = `৳ ${(o.deliveryFee || 0).toLocaleString()} (PAID)`;
   document.getElementById('modalBillCod').innerText = `৳ ${(o.payableOnDelivery || 0).toLocaleString()}`;
 
   const itemsList = document.getElementById('modalItemsList');
@@ -290,18 +339,19 @@ function openOrderDetailModal(orderId) {
     `).join('');
   }
 
+  // Action buttons inside modal (Ensuring cancel is allowed until Delivered)
   const actionBox = document.getElementById('modalActionButtons');
   if (actionBox) {
+    let btns = '';
+    if (o.status !== 'Delivered' && o.status !== 'Cancelled') {
+      if (o.status === 'Order Placed') btns += `<button onclick="updateOrderStatus('${o.orderId}', 'Confirmed Order')" class="bg-blue-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs">Confirm</button>`;
+      if (o.status === 'Confirmed Order') btns += `<button onclick="updateOrderStatus('${o.orderId}', 'Shifted')" class="bg-purple-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs">Shift Parcel</button>`;
+      if (o.status === 'Shifted') btns += `<button onclick="updateOrderStatus('${o.orderId}', 'Delivered')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs">Mark Delivered</button>`;
+      btns += `<button onclick="updateOrderStatus('${o.orderId}', 'Cancelled')" class="bg-red-500 text-white px-3 py-1.5 rounded-xl font-bold text-xs">Cancel Order</button>`;
+    }
     actionBox.innerHTML = `
-      <span class="text-xs font-bold text-slate-500">Status: <strong class="text-slate-800">${o.status}</strong></span>
-      <div class="flex gap-2">
-        ${o.status === 'Order Placed' ? `
-          <button onclick="updateOrderStatus('${o.orderId}', 'Confirmed Order')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs">Confirm</button>
-          <button onclick="updateOrderStatus('${o.orderId}', 'Cancelled')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg font-bold text-xs">Cancel</button>
-        ` : ''}
-        ${o.status === 'Confirmed Order' ? `<button onclick="updateOrderStatus('${o.orderId}', 'Shifted')" class="bg-purple-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs">Shift Parcel</button>` : ''}
-        ${o.status === 'Shifted' ? `<button onclick="updateOrderStatus('${o.orderId}', 'Delivered')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs">Delivered</button>` : ''}
-      </div>
+      <span class="text-xs font-bold text-slate-500 mr-2">Status: <strong class="text-slate-900">${o.status}</strong></span>
+      ${btns}
     `;
   }
 
@@ -312,7 +362,46 @@ function closeOrderDetailModal() {
   document.getElementById('orderDetailModal')?.classList.add('hidden');
 }
 
-// ================= PRODUCTS LOGIC (ADD, EDIT, DELETE) =================
+// ================= 4R PARCEL INVOICE PRINT (NO TrxID / bKash) =================
+function triggerInvoicePrint() {
+  const orderId = document.getElementById('modalOrderIdTitle')?.innerText || 'N/A';
+  const custName = document.getElementById('modalCustName')?.innerText || 'N/A';
+  const custPhone = document.getElementById('modalCustPhone')?.innerText || 'N/A';
+  const custAddress = document.getElementById('modalCustAddress')?.innerText || 'N/A';
+  const subtotal = document.getElementById('modalBillSubtotal')?.innerText || '৳ 0';
+  const codDue = document.getElementById('modalBillCod')?.innerText || '৳ 0';
+
+  // Populate 4R Template (Explicitly without bKash number & TrxID)
+  document.getElementById('printInvId').innerText = orderId;
+  document.getElementById('printInvDate').innerText = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  document.getElementById('printCustName').innerText = custName;
+  document.getElementById('printCustPhone').innerText = custPhone;
+  document.getElementById('printCustAddress').innerText = custAddress;
+  document.getElementById('printSubtotal').innerText = subtotal;
+  document.getElementById('printCodDue').innerText = codDue;
+
+  const modalItems = document.getElementById('modalItemsList');
+  const tableBody = document.getElementById('printItemsTableBody');
+  if (tableBody) {
+    tableBody.innerHTML = '';
+    if (modalItems && modalItems.children.length > 0) {
+      Array.from(modalItems.children).forEach(child => {
+        const title = child.querySelector('p')?.innerText || 'Item';
+        const price = child.querySelector('span.font-bold')?.innerText || '';
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="padding: 4px; border-bottom: 1px solid #eee;">${title}</td>
+          <td style="padding: 4px; text-align: right; border-bottom: 1px solid #eee; font-weight: bold;">${price}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+  }
+
+  window.print();
+}
+
+// ================= MULTIPLE IMAGE PRODUCT LOGIC =================
 async function loadProducts() {
   try {
     const res = await fetch(`${API_BASE}/products`);
@@ -356,7 +445,7 @@ function handleImageUpload(e) {
     reader.onload = (event) => {
       currentUploadedImages.push(event.target.result);
       if (container) {
-        container.innerHTML += `<img src="${event.target.result}" class="w-14 h-14 object-cover rounded-lg border bg-white shadow-sm">`;
+        container.innerHTML += `<img src="${event.target.result}" class="w-14 h-14 object-cover rounded-xl border bg-white shadow-xs">`;
       }
     };
     reader.readAsDataURL(file);
@@ -374,7 +463,7 @@ function handleEditImageUpload(e) {
     reader.onload = (event) => {
       editUploadedImages.push(event.target.result);
       if (container) {
-        container.innerHTML += `<img src="${event.target.result}" class="w-14 h-14 object-cover rounded-lg border bg-white shadow-sm">`;
+        container.innerHTML += `<img src="${event.target.result}" class="w-14 h-14 object-cover rounded-xl border bg-white shadow-xs">`;
       }
     };
     reader.readAsDataURL(file);
@@ -414,10 +503,10 @@ async function handleCreateProduct(e) {
       if (container) container.innerHTML = '';
       await loadProducts();
     } else {
-      alert('Failed to publish product.');
+      alert('Failed to save product.');
     }
   } catch (err) {
-    alert('Server error.');
+    alert('Server communication error.');
   }
 }
 
@@ -436,7 +525,10 @@ function renderAdminProducts() {
   tbody.innerHTML = allProducts.map(p => `
     <tr class="hover:bg-slate-50 transition">
       <td class="p-3.5">
-        <img src="${p.images?.[0] || 'https://placehold.co/100'}" class="w-12 h-12 object-cover rounded-lg border bg-white">
+        <div class="flex items-center gap-1">
+          <img src="${p.images?.[0] || 'https://placehold.co/100'}" class="w-12 h-12 object-cover rounded-xl border bg-white">
+          ${p.images && p.images.length > 1 ? `<span class="text-[10px] bg-slate-200 px-1.5 py-0.5 rounded font-bold">+${p.images.length - 1}</span>` : ''}
+        </div>
       </td>
       <td class="p-3.5 font-bold text-slate-800 text-xs">${p.name}</td>
       <td class="p-3.5"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-bold">${p.category}</span></td>
@@ -444,11 +536,9 @@ function renderAdminProducts() {
       <td class="p-3.5 font-bold ${(p.stock || 0) <= 0 ? 'text-red-500' : 'text-slate-700'}">${p.stock || 0}</td>
       <td class="p-3.5 text-center">
         <div class="flex items-center justify-center gap-2">
-          <!-- Edit Product Button -->
-          <button onclick="openEditProductModal('${p._id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
+          <button onclick="openEditProductModal('${p._id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs">
             <i class="fa-solid fa-pen-to-square"></i> Edit
           </button>
-          <!-- Delete Product Button -->
           <button onclick="handleDeleteProduct('${p._id}')" class="bg-red-100 hover:bg-red-200 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
             <i class="fa-solid fa-trash-can"></i> Delete
           </button>
@@ -458,7 +548,6 @@ function renderAdminProducts() {
   `).join('');
 }
 
-// ================= OPEN / CLOSE & SAVE EDIT MODAL =================
 function openEditProductModal(productId) {
   const prod = allProducts.find(p => p._id === productId);
   if (!prod) return;
@@ -470,7 +559,6 @@ function openEditProductModal(productId) {
   document.getElementById('editProdStock').value = prod.stock || 0;
   document.getElementById('editProdDescription').value = prod.description || '';
 
-  // Calculate discount percent
   if (prod.originalPrice > prod.discountPrice) {
     const percent = Math.round(((prod.originalPrice - prod.discountPrice) / prod.originalPrice) * 100);
     document.getElementById('editProdDiscountPercent').value = percent;
@@ -478,7 +566,6 @@ function openEditProductModal(productId) {
     document.getElementById('editProdDiscountPercent').value = 0;
   }
 
-  // Populate category select
   const catSelect = document.getElementById('editProdCategorySelect');
   if (catSelect) {
     catSelect.innerHTML = allCategories.map(c => `
@@ -486,12 +573,11 @@ function openEditProductModal(productId) {
     `).join('');
   }
 
-  // Populate existing images preview
   const container = document.getElementById('editImagePreviewContainer');
   editUploadedImages = prod.images && prod.images.length > 0 ? [...prod.images] : [];
   if (container) {
     container.innerHTML = editUploadedImages.map(img => `
-      <img src="${img}" class="w-14 h-14 object-cover rounded-lg border bg-white shadow-sm">
+      <img src="${img}" class="w-14 h-14 object-cover rounded-xl border bg-white shadow-xs">
     `).join('');
   }
 
@@ -535,10 +621,10 @@ async function handleUpdateProduct(e) {
       closeEditProductModal();
       await loadProducts();
     } else {
-      alert('Failed to update product. Please check your backend update route.');
+      alert('Failed to update product.');
     }
   } catch (err) {
-    alert('Server connection failed.');
+    alert('Server connection error.');
   }
 }
 
@@ -547,13 +633,10 @@ async function handleDeleteProduct(productId) {
   try {
     const res = await fetch(`${API_BASE}/products/${productId}`, { method: 'DELETE' });
     if (res.ok) {
-      alert('Product deleted.');
       await loadProducts();
-    } else {
-      alert('Failed to delete product.');
     }
   } catch (err) {
-    alert('Server error.');
+    alert('Server communication error.');
   }
 }
 
@@ -582,7 +665,7 @@ function renderAdminCategories() {
   const grid = document.getElementById('adminCategoryGrid');
   if (!grid) return;
   grid.innerHTML = allCategories.map(c => `
-    <div class="flex items-center justify-between p-3.5 bg-slate-50 border rounded-xl">
+    <div class="flex items-center justify-between p-3.5 bg-slate-50 border rounded-2xl">
       <div>
         <p class="font-bold text-xs text-slate-900">${c.name}</p>
         <span class="text-[10px] font-mono text-slate-400">ID: ${c.id}</span>
@@ -606,7 +689,6 @@ async function handleCreateCategory(e) {
       body: JSON.stringify({ name, id })
     });
     if (res.ok) {
-      alert('Category added successfully!');
       document.getElementById('addCategoryForm')?.reset();
       await loadCategories();
     } else {
@@ -621,15 +703,13 @@ async function handleDeleteCategory(catId) {
   if (!confirm(`Delete category "${catId}"?`)) return;
   try {
     const res = await fetch(`${API_BASE}/categories/${catId}`, { method: 'DELETE' });
-    if (res.ok) {
-      await loadCategories();
-    }
+    if (res.ok) await loadCategories();
   } catch (err) {
     alert('Server error.');
   }
 }
 
-// ================= STORE SETTINGS LOGIC =================
+// ================= STORE SETTINGS =================
 async function loadSettings() {
   try {
     const res = await fetch(`${API_BASE}/settings`);
@@ -643,7 +723,7 @@ async function loadSettings() {
       if (outsideInput) outsideInput.value = data.outsideDhakaFee || 120;
     }
   } catch (err) {
-    console.error('Error loading settings:', err);
+    console.warn('Default settings active');
   }
 }
 
@@ -660,16 +740,16 @@ async function handleSaveSettings(e) {
       body: JSON.stringify({ bkashNumber, insideDhakaFee, outsideDhakaFee })
     });
     if (res.ok) {
-      alert('Store settings updated successfully!');
+      alert('Settings updated successfully!');
     } else {
       alert('Failed to save settings.');
     }
   } catch (err) {
-    alert('Server error.');
+    alert('Server communication error.');
   }
 }
 
-// ================= ADMIN ACCOUNTS & ROLES =================
+// ================= ADMIN CREDENTIALS & AUTO-STAFF GENERATOR =================
 async function loadAdminAccounts() {
   try {
     const res = await fetch(`${API_BASE}/admins`);
@@ -678,7 +758,6 @@ async function loadAdminAccounts() {
       renderAdminAccounts(admins);
     }
   } catch (err) {
-    // Fallback if no separate admins collection
     renderAdminAccounts([{ name: 'Super Admin', username: 'admin', role: 'Super Admin' }]);
   }
 }
@@ -692,7 +771,7 @@ function renderAdminAccounts(admins) {
 
   tbody.innerHTML = admins.map(a => `
     <tr class="hover:bg-slate-50 transition">
-      <td class="p-3.5 font-bold text-slate-800">${a.name || 'Admin User'}</td>
+      <td class="p-3.5 font-bold text-slate-800">${a.name || 'Staff User'}</td>
       <td class="p-3.5 font-mono text-slate-600">${a.username}</td>
       <td class="p-3.5"><span class="bg-orange-100 text-brand-orange px-2.5 py-1 rounded-full font-bold text-[10px]">${a.role}</span></td>
       <td class="p-3.5 text-right">
@@ -700,10 +779,20 @@ function renderAdminAccounts(admins) {
           <button onclick="handleDeleteAdmin('${a.username}')" class="text-red-500 hover:text-red-700 font-bold cursor-pointer">
             <i class="fa-solid fa-trash-can"></i>
           </button>
-        ` : `<span class="text-slate-400 font-bold text-[10px]">Master</span>`}
+        ` : `<span class="text-slate-400 font-bold text-[10px]">Master Super Admin</span>`}
       </td>
     </tr>
   `).join('');
+}
+
+// Auto generates random username and strong password for new staff
+function autoGenerateStaffCredentials() {
+  const randNum = Math.floor(100 + Math.random() * 900);
+  const randomPass = 'Deli@' + Math.floor(1000 + Math.random() * 9000);
+  const uInput = document.getElementById('newStaffUsername');
+  const pInput = document.getElementById('newStaffPassword');
+  if (uInput) uInput.value = `staff_${randNum}`;
+  if (pInput) pInput.value = randomPass;
 }
 
 async function handleChangeOwnCredentials(e) {
@@ -725,7 +814,7 @@ async function handleChangeOwnCredentials(e) {
     });
     const data = await res.json();
     if (res.ok && data.success) {
-      alert('Credentials updated! Please login again with new password.');
+      alert('Your credentials were updated successfully! Please login again with your new password.');
       handleAdminLogout();
     } else {
       alert(data.error || 'Failed to update credentials.');
@@ -749,11 +838,11 @@ async function handleCreateNewAdmin(e) {
       body: JSON.stringify({ name, username, password, role })
     });
     if (res.ok) {
-      alert('New admin account created successfully!');
+      alert(`Staff Account Created!\nUsername: ${username}\nPassword: ${password}\nRole: ${role}`);
       e.target.reset();
       await loadAdminAccounts();
     } else {
-      alert('Could not create admin.');
+      alert('Could not create staff account. Username might already exist.');
     }
   } catch (err) {
     alert('Server communication error.');
@@ -761,12 +850,10 @@ async function handleCreateNewAdmin(e) {
 }
 
 async function handleDeleteAdmin(username) {
-  if (!confirm(`Delete admin account "${username}"?`)) return;
+  if (!confirm(`Delete staff account "${username}"?`)) return;
   try {
     const res = await fetch(`${API_BASE}/admins/${username}`, { method: 'DELETE' });
-    if (res.ok) {
-      await loadAdminAccounts();
-    }
+    if (res.ok) await loadAdminAccounts();
   } catch (err) {
     alert('Server error.');
   }

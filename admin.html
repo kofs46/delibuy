@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DeliBuy | Admin Operations Center</title>
   
-  <!-- Browser Tab Favicon Logo -->
+  <!-- Favicon -->
   <link rel="icon" type="image/jpeg" href="delibuy-logo.jpeg">
   <link rel="shortcut icon" type="image/jpeg" href="delibuy-logo.jpeg">
 
@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
+    /* 4R Photo Paper Size Print Styling (4in x 6in / 102mm x 152mm) */
     @media print {
       body * {
         visibility: hidden !important;
@@ -41,16 +42,18 @@
         position: absolute !important;
         left: 0 !important;
         top: 0 !important;
-        width: 100% !important;
-        display: block !important;
-        margin: 0 !important;
-        padding: 20px !important;
-        background: white !important;
+        width: 4in !important;
+        max-width: 4in !important;
+        padding: 8px !important;
+        margin: 0 auto !important;
+        background: #fff !important;
         color: #000 !important;
+        display: block !important;
+        font-family: Arial, sans-serif !important;
       }
       @page {
-        size: A4;
-        margin: 8mm;
+        size: 4in 6in;
+        margin: 3mm;
       }
     }
   </style>
@@ -59,31 +62,31 @@
 
   <!-- ================= LOGIN OVERLAY ================= -->
   <div id="adminLoginOverlay" class="fixed inset-0 z-50 bg-[#0B0F19] flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl space-y-6">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl space-y-6 border border-slate-800/20">
       <div class="text-center space-y-2">
-        <img src="delibuy-logo.jpeg" alt="DeliBuy" class="h-12 mx-auto rounded border border-slate-700 object-cover">
-        <h2 class="text-xl font-black text-slate-900">DeliBuy Staff Portal</h2>
-        <p class="text-xs text-slate-500">Sign in with your assigned admin credentials</p>
+        <img src="delibuy-logo.jpeg" alt="DeliBuy" class="h-14 mx-auto rounded-xl border border-slate-700 object-cover shadow-md">
+        <h2 class="text-2xl font-black text-slate-900">DeliBuy Ops Portal</h2>
+        <p class="text-xs text-slate-500 font-medium">Authenticate with your assigned staff credentials</p>
       </div>
 
       <form onsubmit="handleAdminLogin(event)" class="space-y-4 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Username</label>
-          <input type="text" id="loginUsername" required placeholder="Enter username" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:border-brand-orange">
+          <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Username</label>
+          <input type="text" id="loginUsername" required placeholder="Enter username" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-orange">
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Password</label>
-          <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:border-brand-orange">
+          <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+          <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-orange">
         </div>
 
-        <button type="submit" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-black py-3 rounded-xl transition shadow-lg text-sm cursor-pointer">
-          Authenticate & Access
+        <button type="submit" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-black py-3.5 rounded-xl transition shadow-lg text-sm cursor-pointer">
+          Access Workspace
         </button>
       </form>
 
-      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center text-[11px] text-slate-500">
-        <p>Default Master: <code class="text-slate-800 font-bold">admin</code> | Pass: <code class="text-slate-800 font-bold">delibuy123</code></p>
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center text-[11px] text-slate-500 font-mono">
+        Default Master: <strong>admin</strong> | Pass: <strong>delibuy123</strong>
       </div>
     </div>
   </div>
@@ -92,16 +95,17 @@
   <aside class="w-64 bg-[#0B0F19] text-white flex flex-col justify-between hidden md:flex border-r border-slate-800 shrink-0">
     <div>
       <div class="p-5 border-b border-slate-800 flex items-center gap-3">
-        <img src="delibuy-logo.jpeg" alt="Logo" class="h-10 w-auto rounded border border-slate-700 object-cover">
+        <img src="delibuy-logo.jpeg" alt="Logo" class="h-11 w-auto rounded-xl border border-slate-700 object-cover shadow-sm">
         <div>
-          <h2 class="font-extrabold text-sm tracking-wide">DeliBuy Ops</h2>
-          <span id="sidebarRoleBadge" class="text-[10px] text-brand-orange font-bold uppercase tracking-wider">
+          <h2 class="font-black text-sm tracking-wide">DeliBuy Ops</h2>
+          <span id="sidebarRoleBadge" class="text-[10px] text-brand-orange font-bold uppercase tracking-wider bg-orange-950/60 px-2 py-0.5 rounded-md border border-brand-orange/30">
             Super Admin
           </span>
         </div>
       </div>
 
-      <nav class="p-4 space-y-1.5 text-xs font-bold">
+      <!-- Navigation Tabs (RBAC Controls: Auto-restricted by admin.js) -->
+      <nav class="p-4 space-y-1.5 text-xs font-bold" id="sidebarNavLinks">
         <button onclick="switchTab('dashboardTab')" id="nav-dashboardTab" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 bg-brand-orange text-white transition cursor-pointer">
           <i class="fa-solid fa-chart-pie text-base"></i> Orders Dashboard
         </button>
@@ -112,7 +116,7 @@
           <i class="fa-solid fa-layer-group text-base"></i> Categories
         </button>
         <button onclick="switchTab('teamTab')" id="nav-teamTab" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 text-slate-400 hover:bg-slate-900 hover:text-white transition cursor-pointer">
-          <i class="fa-solid fa-users-gear text-base"></i> Admin & Roles
+          <i class="fa-solid fa-users-gear text-base"></i> Admin & Staff Roles
         </button>
         <button onclick="switchTab('settingsTab')" id="nav-settingsTab" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 text-slate-400 hover:bg-slate-900 hover:text-white transition cursor-pointer">
           <i class="fa-solid fa-sliders text-base"></i> Store Settings
@@ -132,10 +136,13 @@
 
   <!-- ================= MAIN CONTAINER ================= -->
   <div class="flex-1 flex flex-col min-w-0">
-    <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-30 shadow-sm">
-      <h1 id="pageTitle" class="text-xl font-black text-slate-900">Orders Dashboard</h1>
+    <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-30 shadow-xs">
+      <div>
+        <h1 id="pageTitle" class="text-xl font-black text-slate-900">Orders Dashboard</h1>
+        <p class="text-[11px] text-slate-400" id="headerSubTitle">Manage orders and dispatch lifecycle</p>
+      </div>
       <div class="flex items-center gap-3">
-        <span id="headerUserGreeting" class="text-xs text-slate-600 font-bold bg-slate-100 px-3 py-1 rounded-full border">
+        <span id="headerUserGreeting" class="text-xs text-slate-600 font-bold bg-slate-100 px-3.5 py-1.5 rounded-xl border border-slate-200">
           Logged in as: <strong>Admin</strong>
         </span>
         <button onclick="handleAdminLogout()" class="md:hidden text-xs bg-red-100 text-red-600 px-3 py-1.5 rounded-lg font-bold">Logout</button>
@@ -147,55 +154,56 @@
       <!-- ================= TAB 1: DASHBOARD & ORDERS ================= -->
       <section id="dashboardTab" class="admin-tab space-y-6">
         <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-          <div onclick="filterOrdersByStatus('Order Placed')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-orange transition">
+          <div onclick="filterOrdersByStatus('Order Placed')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs cursor-pointer hover:border-brand-orange transition">
             <span class="text-xs font-bold text-slate-400 uppercase">New Orders</span>
             <p id="statNewOrders" class="text-2xl font-black text-slate-900 mt-2">0</p>
             <span class="text-[10px] text-amber-600 font-bold">Needs Confirmation</span>
           </div>
 
-          <div onclick="filterOrdersByStatus('Confirmed Order')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-orange transition">
+          <div onclick="filterOrdersByStatus('Confirmed Order')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs cursor-pointer hover:border-brand-orange transition">
             <span class="text-xs font-bold text-slate-400 uppercase">Confirmed</span>
             <p id="statConfirmedOrders" class="text-2xl font-black text-slate-900 mt-2">0</p>
             <span class="text-[10px] text-blue-600 font-bold">Ready to Shift</span>
           </div>
 
-          <div onclick="filterOrdersByStatus('Shifted')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-orange transition">
+          <div onclick="filterOrdersByStatus('Shifted')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs cursor-pointer hover:border-brand-orange transition">
             <span class="text-xs font-bold text-slate-400 uppercase">Shifted</span>
             <p id="statShiftedOrders" class="text-2xl font-black text-slate-900 mt-2">0</p>
             <span class="text-[10px] text-purple-600 font-bold">In Courier</span>
           </div>
 
-          <div onclick="filterOrdersByStatus('Delivered')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-orange transition">
+          <div onclick="filterOrdersByStatus('Delivered')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs cursor-pointer hover:border-brand-orange transition">
             <span class="text-xs font-bold text-slate-400 uppercase">Delivered</span>
             <p id="statDeliveredOrders" class="text-2xl font-black text-slate-900 mt-2">0</p>
             <span class="text-[10px] text-green-600 font-bold">Completed</span>
           </div>
 
-          <div onclick="filterOrdersByStatus('Cancelled')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-orange transition col-span-2 lg:col-span-1">
+          <div onclick="filterOrdersByStatus('Cancelled')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs cursor-pointer hover:border-brand-orange transition col-span-2 lg:col-span-1">
             <span class="text-xs font-bold text-slate-400 uppercase">Cancelled</span>
             <p id="statCancelledOrders" class="text-2xl font-black text-slate-900 mt-2">0</p>
             <span class="text-[10px] text-red-500 font-bold">Rejected</span>
           </div>
         </div>
 
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+        <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 space-y-4">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
               <i class="fa-solid fa-magnifying-glass text-brand-orange"></i> Search Orders
             </h2>
             <div class="flex flex-wrap gap-1.5" id="orderFilterPills">
-              <button onclick="filterOrdersByStatus('All')" class="filter-pill active px-3 py-1 rounded-lg text-xs font-bold border border-slate-800 bg-[#0B0F19] text-white">All</button>
-              <button onclick="filterOrdersByStatus('Order Placed')" class="filter-pill px-3 py-1 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">New</button>
-              <button onclick="filterOrdersByStatus('Confirmed Order')" class="filter-pill px-3 py-1 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">Confirmed</button>
-              <button onclick="filterOrdersByStatus('Shifted')" class="filter-pill px-3 py-1 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">Shifted</button>
-              <button onclick="filterOrdersByStatus('Delivered')" class="filter-pill px-3 py-1 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">Delivered</button>
+              <button onclick="filterOrdersByStatus('All')" class="filter-pill active px-3.5 py-1.5 rounded-lg text-xs font-bold border border-slate-800 bg-[#0B0F19] text-white">All</button>
+              <button onclick="filterOrdersByStatus('Order Placed')" class="filter-pill px-3.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">New</button>
+              <button onclick="filterOrdersByStatus('Confirmed Order')" class="filter-pill px-3.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">Confirmed</button>
+              <button onclick="filterOrdersByStatus('Shifted')" class="filter-pill px-3.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">Shifted</button>
+              <button onclick="filterOrdersByStatus('Delivered')" class="filter-pill px-3.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">Delivered</button>
+              <button onclick="filterOrdersByStatus('Cancelled')" class="filter-pill px-3.5 py-1.5 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">Cancelled</button>
             </div>
           </div>
-          <input type="text" id="orderSearchInput" oninput="handleOrderSearchLive()" placeholder="Search by Order ID or Phone Number..."
+          <input type="text" id="orderSearchInput" oninput="handleOrderSearchLive()" placeholder="Search by Order ID, Phone Number or Customer Name..."
             class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-brand-orange">
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
           <div class="p-4 border-b border-slate-100 flex justify-between items-center">
             <h3 class="font-bold text-sm text-slate-800">Order Queue</h3>
             <span id="orderTableCount" class="text-xs bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full font-bold">0 records</span>
@@ -206,11 +214,11 @@
                 <tr>
                   <th class="p-3.5">Order ID</th>
                   <th class="p-3.5">Customer</th>
-                  <th class="p-3.5">bKash Trx</th>
-                  <th class="p-3.5">COD Collectible</th>
+                  <th class="p-3.5">bKash Verification</th>
+                  <th class="p-3.5">COD Payable</th>
                   <th class="p-3.5">Status</th>
-                  <th class="p-3.5 text-center">Action</th>
-                  <th class="p-3.5 text-right">Details</th>
+                  <th class="p-3.5 text-center">Lifecycle Actions</th>
+                  <th class="p-3.5 text-right">Details & Print</th>
                 </tr>
               </thead>
               <tbody id="ordersTableBody" class="divide-y divide-slate-100"></tbody>
@@ -219,50 +227,50 @@
         </div>
       </section>
 
-      <!-- ================= TAB 2: PRODUCTS ================= -->
+      <!-- ================= TAB 2: PRODUCTS CATALOG ================= -->
       <section id="productsTab" class="admin-tab hidden space-y-6">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200">
           <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-plus-circle text-brand-orange"></i> Add New Product
+            <i class="fa-solid fa-plus-circle text-brand-orange"></i> Add New Product (Multiple Photos Supported)
           </h2>
 
           <form id="addProductForm" onsubmit="handleCreateProduct(event)" class="space-y-4 text-xs">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Product Title *</label>
-                <input type="text" id="prodTitle" required class="w-full border rounded-lg p-2.5">
+                <input type="text" id="prodTitle" required class="w-full border rounded-xl p-2.5 focus:outline-none focus:border-brand-orange">
               </div>
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Category *</label>
-                <select id="prodCategorySelect" required class="w-full border rounded-lg p-2.5 bg-white"></select>
+                <select id="prodCategorySelect" required class="w-full border rounded-xl p-2.5 bg-white focus:outline-none focus:border-brand-orange"></select>
               </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Regular Price (৳) *</label>
-                <input type="number" id="prodOriginalPrice" oninput="calculateDiscountPrice()" required min="1" class="w-full bg-white border rounded-lg p-2.5">
+                <input type="number" id="prodOriginalPrice" oninput="calculateDiscountPrice()" required min="1" class="w-full bg-white border rounded-xl p-2.5 focus:outline-none focus:border-brand-orange">
               </div>
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Discount % (Optional)</label>
-                <input type="number" id="prodDiscountPercent" oninput="calculateDiscountPrice()" min="0" max="99" class="w-full bg-white border rounded-lg p-2.5">
+                <input type="number" id="prodDiscountPercent" oninput="calculateDiscountPrice()" min="0" max="99" class="w-full bg-white border rounded-xl p-2.5 focus:outline-none focus:border-brand-orange">
               </div>
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Sale Price (৳) *</label>
-                <input type="number" id="prodDiscountPrice" required min="1" class="w-full bg-slate-100 border font-bold text-brand-orange rounded-lg p-2.5">
+                <input type="number" id="prodDiscountPrice" required min="1" class="w-full bg-slate-100 border font-bold text-brand-orange rounded-xl p-2.5">
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Initial Stock Quantity *</label>
-                <input type="number" id="prodStock" required min="0" class="w-full border rounded-lg p-2.5">
+                <input type="number" id="prodStock" required min="0" class="w-full border rounded-xl p-2.5 focus:outline-none focus:border-brand-orange">
               </div>
               <div>
-                <label class="block font-bold text-slate-700 mb-1">Direct Photo Upload (Single/Multiple) *</label>
-                <div onclick="document.getElementById('prodFileInput').click()" class="border-2 border-dashed border-slate-300 hover:border-brand-orange bg-slate-50 p-4 rounded-xl text-center cursor-pointer transition">
+                <label class="block font-bold text-slate-700 mb-1">Direct Photo Upload (Select 1 or Multiple) *</label>
+                <div onclick="document.getElementById('prodFileInput').click()" class="border-2 border-dashed border-slate-300 hover:border-brand-orange bg-slate-50 p-3.5 rounded-xl text-center cursor-pointer transition">
                   <input type="file" id="prodFileInput" multiple accept="image/*" class="hidden" onchange="handleImageUpload(event)">
-                  <p class="text-xs font-bold text-slate-700">Click to choose photos from device</p>
+                  <p class="text-xs font-bold text-slate-700"><i class="fa-solid fa-cloud-arrow-up text-brand-orange mr-1"></i> Choose Photos from Device</p>
                 </div>
               </div>
             </div>
@@ -271,16 +279,16 @@
 
             <div>
               <label class="block font-bold text-slate-700 mb-1">Product Details & Specs *</label>
-              <textarea id="prodDescription" rows="3" required class="w-full border rounded-lg p-2.5"></textarea>
+              <textarea id="prodDescription" rows="3" required class="w-full border rounded-xl p-2.5 focus:outline-none focus:border-brand-orange"></textarea>
             </div>
 
             <button type="submit" class="bg-brand-orange hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-xl transition shadow-md cursor-pointer">
-              Publish Product
+              Publish Product to Store
             </button>
           </form>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
           <div class="p-4 border-b border-slate-100 flex justify-between items-center">
             <h3 class="font-bold text-sm text-slate-800">Inventory Items</h3>
             <span id="adminProdCountBadge" class="text-xs bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full font-bold">0 products</span>
@@ -305,44 +313,46 @@
 
       <!-- ================= TAB 3: CATEGORIES ================= -->
       <section id="categoriesTab" class="admin-tab hidden space-y-6">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200">
           <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
             <i class="fa-solid fa-layer-group text-brand-orange"></i> Add New Category
           </h2>
           <form id="addCategoryForm" onsubmit="handleCreateCategory(event)" class="flex flex-col sm:flex-row gap-3 text-xs">
-            <input type="text" id="newCatName" required placeholder="Category Title" class="flex-1 border rounded-lg p-2.5">
-            <input type="text" id="newCatId" required placeholder="Unique ID (e.g. watch)" class="w-full sm:w-48 border rounded-lg p-2.5 font-mono">
+            <input type="text" id="newCatName" required placeholder="Category Title" class="flex-1 border rounded-xl p-2.5">
+            <input type="text" id="newCatId" required placeholder="Unique ID (e.g. watch)" class="w-full sm:w-48 border rounded-xl p-2.5 font-mono">
             <button type="submit" class="bg-brand-orange hover:bg-orange-600 text-white font-bold py-2.5 px-6 rounded-xl transition shrink-0 cursor-pointer">
               Create Category
             </button>
           </form>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-5">
           <h3 class="font-bold text-sm text-slate-800 mb-3">Active Categories</h3>
           <div id="adminCategoryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
         </div>
       </section>
 
-      <!-- ================= TAB 4: ADMINS, ROLES & PASSWORD CHANGE ================= -->
+      <!-- ================= TAB 4: ADMINS & ROLES WITH AUTO-GENERATE ================= -->
       <section id="teamTab" class="admin-tab hidden space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          
+          <!-- Box 1: Change Own Credentials -->
+          <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
             <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
               <i class="fa-solid fa-key text-brand-orange"></i> Change My Password & Username
             </h2>
             <form onsubmit="handleChangeOwnCredentials(event)" class="space-y-3 text-xs">
               <div>
-                <label class="block font-bold text-slate-700 mb-1">New Username</label>
-                <input type="text" id="changeUsername" required class="w-full border rounded-lg p-2.5">
+                <label class="block font-bold text-slate-700 mb-1">New Username *</label>
+                <input type="text" id="changeUsername" required class="w-full border rounded-xl p-2.5">
               </div>
               <div>
-                <label class="block font-bold text-slate-700 mb-1">Current Password (For Verification)</label>
-                <input type="password" id="currentPassword" required class="w-full border rounded-lg p-2.5">
+                <label class="block font-bold text-slate-700 mb-1">Current Password (For Verification) *</label>
+                <input type="password" id="currentPassword" required class="w-full border rounded-xl p-2.5">
               </div>
               <div>
-                <label class="block font-bold text-slate-700 mb-1">New Password</label>
-                <input type="password" id="newPassword" required minlength="6" class="w-full border rounded-lg p-2.5">
+                <label class="block font-bold text-slate-700 mb-1">New Password *</label>
+                <input type="password" id="newPassword" required minlength="6" class="w-full border rounded-xl p-2.5">
               </div>
               <button type="submit" class="bg-slate-900 hover:bg-black text-white font-bold py-2.5 px-5 rounded-xl transition cursor-pointer">
                 Update My Credentials
@@ -350,45 +360,52 @@
             </form>
           </div>
 
-          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-              <i class="fa-solid fa-user-plus text-brand-orange"></i> Add New Staff / Admin
-            </h2>
+          <!-- Box 2: Create Restricted Staff Account -->
+          <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between">
+              <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-user-shield text-brand-orange"></i> Assign New Staff Member
+              </h2>
+              <button type="button" onclick="autoGenerateStaffCredentials()" class="text-[11px] text-brand-orange font-bold hover:underline cursor-pointer">
+                Auto-Generate Credentials
+              </button>
+            </div>
+
             <form onsubmit="handleCreateNewAdmin(event)" class="space-y-3 text-xs">
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="block font-bold text-slate-700 mb-1">Staff Full Name</label>
-                  <input type="text" id="newStaffName" required placeholder="e.g. Rahim Ahmed" class="w-full border rounded-lg p-2.5">
-                </div>
-                <div>
-                  <label class="block font-bold text-slate-700 mb-1">Staff Username</label>
-                  <input type="text" id="newStaffUsername" required placeholder="rahim_ops" class="w-full border rounded-lg p-2.5">
-                </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Staff Full Name *</label>
+                <input type="text" id="newStaffName" required placeholder="e.g. Rahim Ahmed" class="w-full border rounded-xl p-2.5">
               </div>
 
               <div class="grid grid-cols-2 gap-2">
                 <div>
-                  <label class="block font-bold text-slate-700 mb-1">Temporary Password</label>
-                  <input type="password" id="newStaffPassword" required minlength="6" class="w-full border rounded-lg p-2.5">
+                  <label class="block font-bold text-slate-700 mb-1">Assigned Username *</label>
+                  <input type="text" id="newStaffUsername" required placeholder="rahim_ops" class="w-full border rounded-xl p-2.5 font-mono">
                 </div>
                 <div>
-                  <label class="block font-bold text-slate-700 mb-1">Assigned Job / Role *</label>
-                  <select id="newStaffRole" required class="w-full border rounded-lg p-2.5 bg-white font-bold text-slate-800">
-                    <option value="Super Admin">Super Admin (Full Access)</option>
-                    <option value="Order Manager">Order Manager (Orders Only)</option>
-                    <option value="Product Manager">Product Manager (Products Only)</option>
-                  </select>
+                  <label class="block font-bold text-slate-700 mb-1">Password *</label>
+                  <input type="text" id="newStaffPassword" required minlength="6" placeholder="Pass123" class="w-full border rounded-xl p-2.5 font-mono">
                 </div>
+              </div>
+
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Role / Job Restriction *</label>
+                <select id="newStaffRole" required class="w-full border rounded-xl p-2.5 bg-white font-bold text-slate-800">
+                  <option value="Order Manager">Order Manager (Restricted to Orders & Invoices ONLY)</option>
+                  <option value="Product Manager">Product Manager (Restricted to Products & Categories ONLY)</option>
+                  <option value="Super Admin">Super Admin (Full Unrestricted Access)</option>
+                </select>
               </div>
 
               <button type="submit" class="bg-brand-orange hover:bg-orange-600 text-white font-bold py-2.5 px-5 rounded-xl transition cursor-pointer">
-                Create Admin Account
+                Create & Assign Staff
               </button>
             </form>
           </div>
+
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
           <div class="p-4 border-b border-slate-100 flex justify-between items-center">
             <h3 class="font-bold text-sm text-slate-800">Authorized Admin Accounts</h3>
             <span id="adminAccountsCount" class="text-xs bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full font-bold">1 accounts</span>
@@ -411,23 +428,23 @@
 
       <!-- ================= TAB 5: SETTINGS ================= -->
       <section id="settingsTab" class="admin-tab hidden space-y-6">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-2xl">
+        <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 max-w-2xl">
           <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
             <i class="fa-solid fa-sliders text-brand-orange"></i> Shipping Charges & bKash Setup
           </h2>
           <form id="settingsForm" onsubmit="handleSaveSettings(event)" class="space-y-4 text-xs">
             <div>
               <label class="block font-bold text-slate-700 mb-1">Official bKash Number (Advance Fee Receiver) *</label>
-              <input type="text" id="settingBkashNumber" required class="w-full border rounded-lg p-2.5 font-mono font-bold text-[#E2136E]">
+              <input type="text" id="settingBkashNumber" required class="w-full border rounded-xl p-2.5 font-mono font-bold text-[#E2136E]">
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Inside Dhaka Delivery Fee (৳) *</label>
-                <input type="number" id="settingInsideFee" required min="0" class="w-full border rounded-lg p-2.5 font-bold">
+                <input type="number" id="settingInsideFee" required min="0" class="w-full border rounded-xl p-2.5 font-bold">
               </div>
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Outside Dhaka Delivery Fee (৳) *</label>
-                <input type="number" id="settingOutsideFee" required min="0" class="w-full border rounded-lg p-2.5 font-bold">
+                <input type="number" id="settingOutsideFee" required min="0" class="w-full border rounded-xl p-2.5 font-bold">
               </div>
             </div>
             <button type="submit" class="bg-brand-orange hover:bg-orange-600 text-white font-bold py-2.5 px-6 rounded-xl transition cursor-pointer">
@@ -442,7 +459,7 @@
 
   <!-- ================= EDIT PRODUCT MODAL ================= -->
   <div id="editProductModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl max-h-[92vh] flex flex-col">
+    <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl max-h-[92vh] flex flex-col">
       <div class="p-5 bg-[#0B0F19] text-white flex justify-between items-center">
         <h3 class="text-base font-bold flex items-center gap-2">
           <i class="fa-solid fa-pen-to-square text-brand-orange"></i> Edit Product
@@ -456,39 +473,39 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Product Title *</label>
-            <input type="text" id="editProdTitle" required class="w-full border rounded-lg p-2.5">
+            <input type="text" id="editProdTitle" required class="w-full border rounded-xl p-2.5">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Category *</label>
-            <select id="editProdCategorySelect" required class="w-full border rounded-lg p-2.5 bg-white"></select>
+            <select id="editProdCategorySelect" required class="w-full border rounded-xl p-2.5 bg-white"></select>
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Regular Price (৳) *</label>
-            <input type="number" id="editProdOriginalPrice" oninput="calculateEditDiscountPrice()" required min="1" class="w-full bg-white border rounded-lg p-2.5">
+            <input type="number" id="editProdOriginalPrice" oninput="calculateEditDiscountPrice()" required min="1" class="w-full bg-white border rounded-xl p-2.5">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Discount %</label>
-            <input type="number" id="editProdDiscountPercent" oninput="calculateEditDiscountPrice()" min="0" max="99" class="w-full bg-white border rounded-lg p-2.5">
+            <input type="number" id="editProdDiscountPercent" oninput="calculateEditDiscountPrice()" min="0" max="99" class="w-full bg-white border rounded-xl p-2.5">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Sale Price (৳) *</label>
-            <input type="number" id="editProdDiscountPrice" required min="1" class="w-full bg-slate-100 border font-bold text-brand-orange rounded-lg p-2.5">
+            <input type="number" id="editProdDiscountPrice" required min="1" class="w-full bg-slate-100 border font-bold text-brand-orange rounded-xl p-2.5">
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Stock Quantity *</label>
-            <input type="number" id="editProdStock" required min="0" class="w-full border rounded-lg p-2.5">
+            <input type="number" id="editProdStock" required min="0" class="w-full border rounded-xl p-2.5">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Upload New Photos (Replaces Current)</label>
             <div onclick="document.getElementById('editProdFileInput').click()" class="border-2 border-dashed border-slate-300 hover:border-brand-orange bg-slate-50 p-3 rounded-xl text-center cursor-pointer transition">
               <input type="file" id="editProdFileInput" multiple accept="image/*" class="hidden" onchange="handleEditImageUpload(event)">
-              <p class="text-[11px] font-bold text-slate-700">Click to replace photos</p>
+              <p class="text-[11px] font-bold text-slate-700">Click to choose photos from device</p>
             </div>
           </div>
         </div>
@@ -497,7 +514,7 @@
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">Product Details & Specs *</label>
-          <textarea id="editProdDescription" rows="3" required class="w-full border rounded-lg p-2.5"></textarea>
+          <textarea id="editProdDescription" rows="3" required class="w-full border rounded-xl p-2.5"></textarea>
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-2">
@@ -514,20 +531,20 @@
 
   <!-- ================= ORDER INSPECTION MODAL ================= -->
   <div id="orderDetailModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl max-h-[92vh] flex flex-col">
+    <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl max-h-[92vh] flex flex-col">
       <div class="p-5 bg-[#0B0F19] text-white flex justify-between items-center">
         <h3 class="text-base font-bold flex items-center gap-2">
           <i class="fa-solid fa-file-invoice text-brand-orange"></i> Order Details: <span id="modalOrderIdTitle" class="text-brand-orange font-mono"></span>
         </h3>
         <div class="flex items-center gap-3">
-          <button onclick="triggerInvoicePrint()" class="bg-brand-orange hover:bg-orange-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition cursor-pointer shadow">
-            <i class="fa-solid fa-print"></i> Print Invoice
+          <button onclick="triggerInvoicePrint()" class="bg-brand-orange hover:bg-orange-600 text-white font-bold px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer shadow">
+            <i class="fa-solid fa-print"></i> Print 4R Invoice
           </button>
           <button onclick="closeOrderDetailModal()" class="text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
       </div>
       <div class="p-6 overflow-y-auto space-y-5 text-xs">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
           <div>
             <span class="text-[10px] font-bold text-slate-400 uppercase">Customer Info</span>
             <p id="modalCustName" class="font-bold text-slate-800 text-sm mt-0.5"></p>
@@ -540,7 +557,7 @@
           </div>
         </div>
 
-        <div class="p-4 bg-pink-50 border border-pink-200 rounded-xl space-y-1">
+        <div class="p-4 bg-pink-50 border border-pink-200 rounded-2xl space-y-1">
           <p class="font-bold text-pink-900"><i class="fa-solid fa-shield-check text-[#E2136E]"></i> Advance bKash Delivery Charge</p>
           <p class="text-slate-700">Sender Number: <strong id="modalBkashSender" class="font-mono"></strong></p>
           <p class="text-slate-700">Transaction ID (TrxID): <strong id="modalBkashTrx" class="font-mono text-[#E2136E] text-sm"></strong></p>
@@ -548,10 +565,10 @@
 
         <div>
           <span class="text-[10px] font-bold text-slate-400 uppercase">Items Purchased</span>
-          <div id="modalItemsList" class="mt-2 divide-y divide-slate-100 border rounded-xl overflow-hidden"></div>
+          <div id="modalItemsList" class="mt-2 divide-y divide-slate-100 border rounded-2xl overflow-hidden"></div>
         </div>
 
-        <div class="bg-slate-50 p-4 rounded-xl border space-y-1 font-semibold text-slate-600">
+        <div class="bg-slate-50 p-4 rounded-2xl border space-y-1 font-semibold text-slate-600">
           <div class="flex justify-between"><span>Items Subtotal:</span><span id="modalBillSubtotal"></span></div>
           <div class="flex justify-between"><span>Advance Shipping Paid:</span><span id="modalBillShipping"></span></div>
           <div class="border-t pt-2 flex justify-between font-black text-sm text-slate-900">
@@ -562,133 +579,79 @@
         <div class="pt-2 flex items-center justify-between gap-2">
           <div id="modalActionButtons" class="flex items-center gap-2"></div>
           <button onclick="triggerInvoicePrint()" class="bg-slate-900 hover:bg-black text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition cursor-pointer">
-            <i class="fa-solid fa-print text-brand-orange"></i> Print Invoice
+            <i class="fa-solid fa-print text-brand-orange"></i> Print 4R Invoice
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ================= PRINTABLE INVOICE TEMPLATE ================= -->
+  <!-- ================= 4R PARCEL INVOICE (DELIBUY BRAND, NO TrxID / bKash) ================= -->
   <div id="printableInvoiceArea" class="hidden">
-    <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 24px; color: #111;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <img src="delibuy-logo.jpeg" alt="DeliBuy" style="height: 52px; width: auto; border-radius: 6px; border: 1px solid #ddd; object-fit: cover;">
-          <div>
-            <h1 style="font-size: 24px; font-weight: 900; margin: 0; color: #0B0F19;">DeliBuy Store</h1>
-            <p style="font-size: 11px; color: #64748b; margin: 2px 0 0;">Bank Town, Savar, Dhaka-1347 | Hotline: 01516-597972</p>
-          </div>
+    <div style="border: 1px solid #000; padding: 10px; border-radius: 4px; font-family: Arial, sans-serif;">
+      
+      <!-- Store Header -->
+      <div style="text-align: center; border-bottom: 2px dashed #000; padding-bottom: 6px; margin-bottom: 8px;">
+        <h1 style="font-size: 20px; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: 1px;">DELIBUY</h1>
+        <p style="font-size: 9px; margin: 2px 0 0; color: #333;">Hotline: 01516-597972 | Online Official Store</p>
+        <p style="font-size: 11px; font-weight: bold; margin: 4px 0 0; text-decoration: underline;">COURIER PARCEL CHALAN</p>
+      </div>
+
+      <!-- Order ID & Date -->
+      <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">
+        <span><strong>Order ID:</strong> <span id="printInvId"></span></span>
+        <span id="printInvDate"></span>
+      </div>
+
+      <!-- Deliver To -->
+      <div style="font-size: 11px; margin-bottom: 8px; line-height: 1.3; background: #fdfdfd; padding: 6px; border: 1px solid #eee; border-radius: 4px;">
+        <p style="margin: 0 0 2px;"><strong>Deliver To:</strong> <span id="printCustName" style="font-weight: bold;"></span></p>
+        <p style="margin: 0 0 2px;"><strong>Phone:</strong> <span id="printCustPhone" style="font-weight: bold;"></span></p>
+        <p style="margin: 0;"><strong>Address:</strong> <span id="printCustAddress"></span></p>
+      </div>
+
+      <!-- Items Table -->
+      <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 8px; border-top: 1px solid #000; border-bottom: 1px solid #000;">
+        <thead>
+          <tr style="background: #f0f0f0;">
+            <th style="padding: 4px; text-align: left;">Item Description</th>
+            <th style="padding: 4px; text-align: right;">Amount</th>
+          </tr>
+        </thead>
+        <tbody id="printItemsTableBody"></tbody>
+      </table>
+
+      <!-- Billing Summary -->
+      <div style="font-size: 10px; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 6px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+          <span>Items Subtotal:</span>
+          <span id="printSubtotal"></span>
         </div>
-        <div style="text-align: right;">
-          <h2 style="font-size: 18px; font-weight: 800; color: #FF6B2C; margin: 0;">PARCEL INVOICE</h2>
-          <p style="font-size: 13px; font-weight: bold; margin: 4px 0 0;" id="printInvId"></p>
-          <p style="font-size: 11px; color: #64748b; margin: 2px 0 0;" id="printInvDate"></p>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+          <span>Advance Delivery Charge:</span>
+          <span style="font-weight: bold;">(PAID)</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 900; border-top: 1px solid #000; padding-top: 4px; margin-top: 2px;">
+          <span>COLLECTIBLE COD:</span>
+          <span id="printCodDue" style="font-size: 14px;"></span>
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-        <div style="background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
-          <h4 style="font-size: 11px; text-transform: uppercase; color: #64748b; margin: 0 0 6px; font-weight: bold;">Deliver To (Customer)</h4>
-          <p style="font-size: 14px; font-weight: bold; margin: 0 0 3px;" id="printCustName"></p>
-          <p style="font-size: 12px; margin: 0 0 3px;"><strong>Phone:</strong> <span id="printCustPhone"></span></p>
-          <p style="font-size: 12px; margin: 0; line-height: 1.4;"><strong>Address:</strong> <span id="printCustAddress"></span></p>
+      <!-- Signatures -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 8px; margin-top: 14px;">
+        <div style="text-align: center; width: 45%;">
+          <div style="border-top: 1px solid #000; margin-bottom: 2px;"></div>
+          <span>DeliBuy Authority</span>
         </div>
-
-        <div style="background: #fff7ed; padding: 14px; border-radius: 8px; border: 1px solid #fed7aa;">
-          <h4 style="font-size: 11px; text-transform: uppercase; color: #9a3412; margin: 0 0 6px; font-weight: bold;">Courier & Payment Details</h4>
-          <p style="font-size: 12px; margin: 0 0 4px;"><strong>Location:</strong> <span id="printLocation"></span></p>
-          <p style="font-size: 12px; margin: 0 0 4px;"><strong>bKash Fee Paid:</strong> <span id="printBkashPaid" style="color: #16a34a; font-weight: bold;"></span></p>
-          <p style="font-size: 11px; color: #475569; margin: 0;"><strong>TrxID:</strong> <span id="printBkashTrx" style="font-family: monospace;"></span></p>
+        <div style="text-align: center; width: 45%;">
+          <div style="border-top: 1px solid #000; margin-bottom: 2px;"></div>
+          <span>Receiver Signature</span>
         </div>
       </div>
 
-      <div style="margin-bottom: 20px;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
-          <thead>
-            <tr style="background: #0B0F19; color: white;">
-              <th style="padding: 10px 12px; border-radius: 6px 0 0 0;">Item Description</th>
-              <th style="padding: 10px 12px; text-align: right; border-radius: 0 6px 0 0;">Ordered Details</th>
-            </tr>
-          </thead>
-          <tbody id="printItemsTableBody"></tbody>
-        </table>
-      </div>
-
-      <div style="display: flex; justify-content: flex-end; margin-bottom: 30px;">
-        <div style="width: 320px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px;">
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
-            <span style="color: #64748b;">Products Subtotal:</span>
-            <strong id="printSubtotal"></strong>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
-            <span style="color: #64748b;">Advance Delivery Fee:</span>
-            <span style="color: #16a34a; font-weight: bold;">(PAID)</span>
-          </div>
-          <div style="border-top: 2px solid #cbd5e1; padding-top: 8px; display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; color: #0B0F19;">
-            <span>Total COD Due:</span>
-            <span id="printCodDue" style="color: #FF6B2C;"></span>
-          </div>
-          <p style="font-size: 10px; color: #64748b; margin: 6px 0 0; text-align: right;">(Customer will pay this cash to courier)</p>
-        </div>
-      </div>
-
-      <div style="display: flex; justify-content: space-between; margin-top: 50px; padding-top: 20px; border-top: 1px dashed #cbd5e1; font-size: 11px; color: #475569;">
-        <div style="text-align: center; width: 180px;">
-          <div style="border-top: 1px solid #94a3b8; margin-bottom: 4px;"></div>
-          <span>Authorized DeliBuy Seal</span>
-        </div>
-        <div style="text-align: center; width: 180px;">
-          <div style="border-top: 1px solid #94a3b8; margin-bottom: 4px;"></div>
-          <span>Customer Signature & Date</span>
-        </div>
-      </div>
+      <p style="font-size: 8px; text-align: center; margin: 6px 0 0; color: #555;">Thank you for shopping with DeliBuy!</p>
     </div>
   </div>
-
-  <script>
-    function triggerInvoicePrint() {
-      const orderId = document.getElementById('modalOrderIdTitle')?.innerText || 'N/A';
-      const custName = document.getElementById('modalCustName')?.innerText || 'N/A';
-      const custPhone = document.getElementById('modalCustPhone')?.innerText || 'N/A';
-      const custAddress = document.getElementById('modalCustAddress')?.innerText || 'N/A';
-      const location = document.getElementById('modalLocationBadge')?.innerText || 'Standard Delivery';
-      const subtotal = document.getElementById('modalBillSubtotal')?.innerText || '৳ 0';
-      const shipping = document.getElementById('modalBillShipping')?.innerText || '৳ 0';
-      const codDue = document.getElementById('modalBillCod')?.innerText || '৳ 0';
-      const trxId = document.getElementById('modalBkashTrx')?.innerText || 'N/A';
-
-      document.getElementById('printInvId').innerText = orderId;
-      document.getElementById('printInvDate').innerText = 'Date: ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-      document.getElementById('printCustName').innerText = custName;
-      document.getElementById('printCustPhone').innerText = custPhone;
-      document.getElementById('printCustAddress').innerText = custAddress;
-      document.getElementById('printLocation').innerText = location;
-      document.getElementById('printBkashPaid').innerText = `${shipping} (PAID)`;
-      document.getElementById('printBkashTrx').innerText = trxId;
-      document.getElementById('printSubtotal').innerText = subtotal;
-      document.getElementById('printCodDue').innerText = codDue;
-
-      const modalItems = document.getElementById('modalItemsList');
-      const tableBody = document.getElementById('printItemsTableBody');
-      if (tableBody) {
-        tableBody.innerHTML = '';
-        if (modalItems && modalItems.children.length > 0) {
-          Array.from(modalItems.children).forEach((child, index) => {
-            const row = document.createElement('tr');
-            row.style.borderBottom = '1px solid #e2e8f0';
-            row.style.background = index % 2 === 0 ? '#ffffff' : '#f8fafc';
-            row.innerHTML = `
-              <td style="padding: 10px 12px; font-weight: bold; color: #1e293b;">${child.innerText.split('\n')[0] || 'Ordered Product'}</td>
-              <td style="padding: 10px 12px; text-align: right; color: #475569;">${child.innerText.split('\n').slice(1).join(' | ') || ''}</td>
-            `;
-            tableBody.appendChild(row);
-          });
-        }
-      }
-      window.print();
-    }
-  </script>
 
   <script src="admin.js"></script>
 </body>
