@@ -1,7 +1,6 @@
 /**
  * DeliBuy Customer Storefront Controller
- * Fully integrated with Modern UI Mockup, Dynamic Categories, 
- * Hover Zoom Gallery, Persistent Cart & Live Cloud Tracking.
+ * Fully Cleaned: Zero Star Ratings, Dynamic Delivery Fees & Live Tracking
  */
 
 const API_BASE = 'https://delibuy.onrender.com/api';
@@ -31,8 +30,14 @@ async function loadSettings() {
     const res = await fetch(`${API_BASE}/settings`);
     if (res.ok) {
       storeSettings = await res.json();
+      
       const bkashEl = document.getElementById('checkoutBkashTarget');
       if (bkashEl) bkashEl.innerText = storeSettings.bkashNumber || '01516-597972';
+
+      const insideLabel = document.getElementById('labelFeeInside');
+      const outsideLabel = document.getElementById('labelFeeOutside');
+      if (insideLabel) insideLabel.innerText = storeSettings.insideDhakaFee ?? 60;
+      if (outsideLabel) outsideLabel.innerText = storeSettings.outsideDhakaFee ?? 120;
     }
   } catch (e) {
     console.warn('Using default store settings');
@@ -151,7 +156,7 @@ function executeSearch(query) {
   renderProductGrid(filtered);
 }
 
-// ================= PRODUCT CARD DISPLAY (MATCHING MOCKUP) =================
+// ================= PRODUCT CARD DISPLAY (NO RATINGS) =================
 function renderProducts() {
   let filtered = activeCategory === 'all' 
     ? products 
@@ -174,15 +179,11 @@ function renderProductGrid(items) {
     const hasDiscount = p.originalPrice && p.originalPrice > p.discountPrice;
     const discountPercent = hasDiscount ? Math.round(((p.originalPrice - p.discountPrice) / p.originalPrice) * 100) : 0;
     const isOutOfStock = (p.stock || 0) <= 0;
-    
-    // Generates clean consistent rating & reviews based on product name
-    const ratingVal = (4.5 + ((p.name.length % 5) * 0.1)).toFixed(1);
-    const reviewCount = (p.name.length * 7) + 18;
 
     return `
       <div class="bg-white rounded-2xl border border-orange-100/80 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group relative">
         
-        <!-- Discount Tag (Top Left) -->
+        <!-- Discount Tag -->
         ${hasDiscount ? `
           <span class="absolute top-3 left-3 z-10 bg-brand-orange text-white text-[11px] font-black px-2.5 py-1 rounded-lg shadow-sm">
             ${discountPercent}% OFF
@@ -199,21 +200,13 @@ function renderProductGrid(items) {
           ` : ''}
         </div>
 
-        <!-- Product Meta Info -->
+        <!-- Product Meta (Clean without any Star Ratings) -->
         <div class="p-4 flex-1 flex flex-col justify-between">
-          <div>
+          <div class="mb-3">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">${p.category}</span>
-            <h3 onclick="openProductModal('${p._id}')" class="font-extrabold text-sm text-slate-900 line-clamp-1 hover:text-brand-orange cursor-pointer transition mb-1">
+            <h3 onclick="openProductModal('${p._id}')" class="font-extrabold text-sm text-slate-900 line-clamp-2 hover:text-brand-orange cursor-pointer transition">
               ${p.name}
             </h3>
-
-            <!-- Star Rating (Mockup Look) -->
-            <div class="flex items-center gap-1.5 text-xs mb-3">
-              <span class="text-amber-500 font-bold flex items-center gap-0.5">
-                <i class="fa-solid fa-star text-[10px]"></i> ${ratingVal}
-              </span>
-              <span class="text-slate-400 text-[11px]">(${reviewCount})</span>
-            </div>
           </div>
 
           <!-- Price & Round Orange Cart Button -->
@@ -238,7 +231,7 @@ function renderProductGrid(items) {
   }).join('');
 }
 
-// ================= PRODUCT DETAILS MODAL & GALLERY =================
+// ================= PRODUCT DETAILS MODAL =================
 function openProductModal(productId) {
   const prod = products.find(p => p._id === productId);
   if (!prod) return;
