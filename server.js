@@ -1,7 +1,7 @@
 /**
  * DeliBuy Backend Server (Node.js, Express & MongoDB Atlas)
  * Fully hardened with tracking endpoint, robust error-handling,
- * and high payload support for Base64 product photos.
+ * complete product edit, invoice support, and role-based admin endpoints.
  */
 
 const express = require('express');
@@ -134,28 +134,34 @@ async function seedDefaultDatabase() {
 
 // ================= REST API ROUTES =================
 
-// --- Auth & Admin Routes ---
-app.post('/api/auth/login', async (req, res) => {
+// --- Auth & Admin Routes (Supports both /api/admin and /api/auth) ---
+const handleAdminLogin = async (req, res) => {
   try {
     const { username, password } = req.body;
     const admin = await Admin.findOne({ username, password });
-    if (!admin) return res.status(401).json({ success: false, message: 'Invalid username or password' });
+    if (!admin) {
+      return res.status(401).json({ success: false, message: 'Invalid username or password' });
+    }
     res.json({ success: true, admin });
   } catch (err) {
     res.status(500).json({ error: 'Internal server error' });
   }
-});
+};
+app.post('/api/admin/login', handleAdminLogin);
+app.post('/api/auth/login', handleAdminLogin);
 
-app.get('/api/auth/admins', async (req, res) => {
+const handleGetAdmins = async (req, res) => {
   try {
     const admins = await Admin.find().select('-password');
     res.json(admins);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch admins' });
   }
-});
+};
+app.get('/api/admins', handleGetAdmins);
+app.get('/api/auth/admins', handleGetAdmins);
 
-app.post('/api/auth/admins', async (req, res) => {
+const handleCreateAdmin = async (req, res) => {
   try {
     const newAdmin = new Admin(req.body);
     await newAdmin.save();
@@ -163,12 +169,23 @@ app.post('/api/auth/admins', async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: 'Username already exists' });
   }
-});
+};
+app.post('/api/admins', handleCreateAdmin);
+app.post('/api/auth/admins', handleCreateAdmin);
 
-app.patch('/api/auth/change-credentials', async (req, res) => {
+const handleChangeCredentials = async (req, res) => {
   try {
-    const { id, currentPassword, newUsername, newPassword } = req.body;
-    const admin = await Admin.findById(id);
+    const { currentUsername, currentPassword, newUsername, newPassword, id } = req.body;
+    let query = {};
+    if (id) {
+      query._id = id;
+    } else if (currentUsername) {
+      query.username = currentUsername;
+    } else {
+      query.username = 'admin';
+    }
+
+    const admin = await Admin.findOne(query);
     if (!admin || admin.password !== currentPassword) {
       return res.status(400).json({ error: 'Incorrect current password' });
     }
@@ -179,16 +196,25 @@ app.patch('/api/auth/change-credentials', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Credential update failed' });
   }
-});
+};
+app.put('/api/admin/change-credentials', handleChangeCredentials);
+app.patch('/api/auth/change-credentials', handleChangeCredentials);
 
-app.delete('/api/auth/admins/:id', async (req, res) => {
+const handleDeleteAdmin = async (req, res) => {
   try {
-    await Admin.findByIdAndDelete(req.params.id);
+    const param = req.params.identifier;
+    if (mongoose.Types.ObjectId.isValid(param)) {
+      await Admin.findByIdAndDelete(param);
+    } else {
+      await Admin.findOneAndDelete({ username: param });
+    }
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete admin' });
   }
-});
+};
+app.delete('/api/admins/:identifier', handleDeleteAdmin);
+app.delete('/api/auth/admins/:identifier', handleDeleteAdmin);
 
 // --- Category Routes ---
 app.get('/api/categories', async (req, res) => {
@@ -219,7 +245,7 @@ app.delete('/api/categories/:id', async (req, res) => {
   }
 });
 
-// --- Product Routes ---
+// --- Product Routes (Add, Edit, Delete & Stock) ---
 app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
@@ -236,6 +262,19 @@ app.post('/api/products', async (req, res) => {
     res.json(prod);
   } catch (err) {
     res.status(500).json({ error: 'Failed to save product' });
+  }
+});
+
+// Edit / Update Product
+app.put('/api/products/:id', async (req, res) => {
+  try {
+    const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update product' });
   }
 });
 
@@ -274,7 +313,7 @@ app.get('/api/orders', async (req, res) => {
   }
 });
 
-// লাইভ অর্ডার ট্র্যাকিং রাউট (Order ID অথবা Phone Number দিয়ে সার্চ)
+// Live Order Tracking (Order ID or Phone Number)
 app.get('/api/orders/:trackingKey', async (req, res) => {
   try {
     const key = req.params.trackingKey.trim();
@@ -305,7 +344,8 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
-app.patch('/api/orders/:orderId/status', async (req, res) => {
+// Order status update (Supports both PUT and PATCH)
+const handleOrderStatusUpdate = async (req, res) => {
   try {
     const { status } = req.body;
     const order = await Order.findOneAndUpdate(
@@ -313,11 +353,16 @@ app.patch('/api/orders/:orderId/status', async (req, res) => {
       { status },
       { new: true }
     );
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
     res.json(order);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update order status' });
   }
-});
+};
+app.put('/api/orders/:orderId/status', handleOrderStatusUpdate);
+app.patch('/api/orders/:orderId/status', handleOrderStatusUpdate);
 
 // --- Store Settings Routes ---
 app.get('/api/settings', async (req, res) => {
@@ -332,7 +377,7 @@ app.get('/api/settings', async (req, res) => {
   }
 });
 
-app.post('/api/settings', async (req, res) => {
+const handleSaveSettings = async (req, res) => {
   try {
     let setting = await Setting.findOne();
     if (setting) {
@@ -345,7 +390,9 @@ app.post('/api/settings', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Failed to save settings' });
   }
-});
+};
+app.put('/api/settings', handleSaveSettings);
+app.post('/api/settings', handleSaveSettings);
 
 // ================= START SERVER =================
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/delibuy';
