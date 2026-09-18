@@ -3,7 +3,7 @@
  * Updated with parcel rejection/return workflows across active delivery states.
  */
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://delibuy.onrender.com/api';
 
 let currentOrderFilter = 'All';
 let currentUploadedImages = [];
