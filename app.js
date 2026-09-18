@@ -3,7 +3,7 @@
  * Complete with Product Click Details, Zoomable Gallery, Cart, Checkout & Tracking
  */
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://delibuy.onrender.com/api';
 
 let products = [];
 let categories = [];
