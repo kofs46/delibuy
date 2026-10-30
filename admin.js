@@ -10,6 +10,7 @@ let currentOrderFilter = 'All';
 let currentUploadedImages = [];
 let editUploadedImages = [];
 let loggedAdmin = null;
+let currentInspectedOrder = null;
 
 let allOrders = [];
 let allProducts = [];
@@ -309,9 +310,10 @@ async function updateOrderStatus(orderId, newStatus) {
   }
 }
 
-function openOrderDetailModal(orderId) {
+function openOrderDetailModal(orderId) { currentInspectedOrder = allOrders.find(item => item.orderId === orderId);
   const o = allOrders.find(item => item.orderId === orderId);
   if (!o) return;
+  currentInspectedOrder = o;
 
   document.getElementById('modalOrderIdTitle').innerText = o.orderId;
   document.getElementById('modalCustName').innerText = o.customer?.name || 'N/A';
@@ -326,17 +328,66 @@ function openOrderDetailModal(orderId) {
   document.getElementById('modalBillShipping').innerText = `৳ ${(o.deliveryFee || 0).toLocaleString()} (PAID)`;
   document.getElementById('modalBillCod').innerText = `৳ ${(o.payableOnDelivery || 0).toLocaleString()}`;
 
+  const countBadge = document.getElementById('modalItemsCountBadge');
+  if (countBadge) {
+    const totalQty = (o.items || []).reduce((sum, it) => sum + (it.qty || 1), 0);
+    countBadge.innerText = `${(o.items || []).length} item${(o.items || []).length === 1 ? '' : 's'} (${totalQty} pcs)`;
+  }
+
   const itemsList = document.getElementById('modalItemsList');
   if (itemsList) {
-    itemsList.innerHTML = (o.items || []).map(item => `
-      <div class="flex justify-between items-center p-3 bg-white">
-        <div>
-          <p class="font-bold text-slate-800 text-xs">${item.name}</p>
-          <span class="text-slate-400 text-[11px]">Qty: ${item.qty} × ৳ ${(item.price || 0).toLocaleString()}</span>
-        </div>
-        <span class="font-bold text-slate-900 text-xs">৳ ${((item.price || 0) * (item.qty || 1)).toLocaleString()}</span>
-      </div>
-    `).join('');
+    if (!o.items || o.items.length === 0) {
+      itemsList.innerHTML = '<div class="p-6 text-center text-slate-400 font-bold text-xs bg-slate-50 rounded-2xl">No items in this order.</div>';
+    } else {
+      itemsList.innerHTML = o.items.map(item => {
+        // Find matching catalog product if extra images or details needed
+        const catalogProd = allProducts.find(p => String(p._id) === String(item.id) || p.name === item.name);
+        const imgSrc = item.image || (catalogProd && catalogProd.images && catalogProd.images[0]) || 'https://placehold.co/120x120?text=Product';
+        const category = (catalogProd && catalogProd.category) || 'General';
+        const stockInfo = catalogProd 
+          ? (catalogProd.stock > 0 
+              ? `<span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full"><i class="fa-solid fa-check mr-1"></i>${catalogProd.stock} in stock</span>`
+              : `<span class="text-[10px] text-red-500 font-bold bg-red-50 px-2 py-0.5 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Out of stock</span>`)
+          : '';
+
+        const itemTotal = (item.price || 0) * (item.qty || 1);
+
+        return `
+          <div class="order-product-card flex items-center justify-between p-3.5 bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:border-brand-orange/40 transition gap-3">
+            <div class="flex items-center gap-3.5 min-w-0">
+              <!-- Clickable Image with Zoom Overlay -->
+              <div class="relative group cursor-pointer shrink-0" onclick="openLightbox('${imgSrc}')" title="Click to view full photo">
+                <img src="${imgSrc}" alt="${item.name}" onerror="this.src='https://placehold.co/120x120?text=No+Photo'"
+                  class="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-xl border border-slate-200 bg-slate-50 p-1 group-hover:scale-105 transition-transform duration-200">
+                <div class="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition text-white text-xs pointer-events-none">
+                  <i class="fa-solid fa-magnifying-glass-plus"></i>
+                </div>
+              </div>
+
+              <!-- Product Details -->
+              <div class="space-y-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[9px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md border border-slate-200/60">${category}</span>
+                  ${stockInfo}
+                </div>
+                <h4 class="font-bold text-slate-800 text-xs sm:text-sm line-clamp-2 leading-snug">${item.name}</h4>
+                <div class="flex items-center gap-2.5 text-xs text-slate-500 flex-wrap">
+                  <span>Unit: <strong class="text-slate-800">৳ ${(item.price || 0).toLocaleString()}</strong></span>
+                  <span>•</span>
+                  <span>Qty: <strong class="text-brand-orange bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200 font-black">${item.qty || 1}</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Price Total for this Item -->
+            <div class="text-right pl-2 shrink-0">
+              <span class="text-[10px] text-slate-400 uppercase font-bold block">Subtotal</span>
+              <span class="font-black text-brand-orange text-sm sm:text-base whitespace-nowrap">৳ ${itemTotal.toLocaleString()}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
   }
 
   // Action buttons inside modal (Ensuring cancel is allowed until Delivered)
@@ -344,10 +395,10 @@ function openOrderDetailModal(orderId) {
   if (actionBox) {
     let btns = '';
     if (o.status !== 'Delivered' && o.status !== 'Cancelled') {
-      if (o.status === 'Order Placed') btns += `<button onclick="updateOrderStatus('${o.orderId}', 'Confirmed Order')" class="bg-blue-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs">Confirm</button>`;
-      if (o.status === 'Confirmed Order') btns += `<button onclick="updateOrderStatus('${o.orderId}', 'Shifted')" class="bg-purple-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs">Shift Parcel</button>`;
-      if (o.status === 'Shifted') btns += `<button onclick="updateOrderStatus('${o.orderId}', 'Delivered')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs">Mark Delivered</button>`;
-      btns += `<button onclick="updateOrderStatus('${o.orderId}', 'Cancelled')" class="bg-red-500 text-white px-3 py-1.5 rounded-xl font-bold text-xs">Cancel Order</button>`;
+      if (o.status === 'Order Placed') btns += `<button onclick="updateOrderStatus('${o.orderId}', 'Confirmed Order')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs cursor-pointer transition">Confirm</button>`;
+      if (o.status === 'Confirmed Order') btns += `<button onclick="updateOrderStatus('${o.orderId}', 'Shifted')" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs cursor-pointer transition">Shift Parcel</button>`;
+      if (o.status === 'Shifted') btns += `<button onclick="updateOrderStatus('${o.orderId}', 'Delivered')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold text-xs cursor-pointer transition">Mark Delivered</button>`;
+      btns += `<button onclick="updateOrderStatus('${o.orderId}', 'Cancelled')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs cursor-pointer transition">Cancel Order</button>`;
     }
     actionBox.innerHTML = `
       <span class="text-xs font-bold text-slate-500 mr-2">Status: <strong class="text-slate-900">${o.status}</strong></span>
@@ -360,16 +411,33 @@ function openOrderDetailModal(orderId) {
 
 function closeOrderDetailModal() {
   document.getElementById('orderDetailModal')?.classList.add('hidden');
+  currentInspectedOrder = null;
+}
+
+// Lightbox for inspecting high-res product photo
+function openLightbox(imgSrc) {
+  const lb = document.getElementById('imageLightbox');
+  const img = document.getElementById('lightboxImg');
+  if (lb && img) {
+    img.src = imgSrc;
+    lb.classList.remove('hidden');
+  }
+}
+
+function closeLightbox() {
+  const lb = document.getElementById('imageLightbox');
+  if (lb) lb.classList.add('hidden');
 }
 
 // ================= 4R PARCEL INVOICE PRINT (NO TrxID / bKash) =================
 function triggerInvoicePrint() {
-  const orderId = document.getElementById('modalOrderIdTitle')?.innerText || 'N/A';
-  const custName = document.getElementById('modalCustName')?.innerText || 'N/A';
-  const custPhone = document.getElementById('modalCustPhone')?.innerText || 'N/A';
-  const custAddress = document.getElementById('modalCustAddress')?.innerText || 'N/A';
-  const subtotal = document.getElementById('modalBillSubtotal')?.innerText || '৳ 0';
-  const codDue = document.getElementById('modalBillCod')?.innerText || '৳ 0';
+  const o = currentInspectedOrder;
+  const orderId = o?.orderId || document.getElementById('modalOrderIdTitle')?.innerText || 'N/A';
+  const custName = o?.customer?.name || document.getElementById('modalCustName')?.innerText || 'N/A';
+  const custPhone = o?.customer?.phone || document.getElementById('modalCustPhone')?.innerText || 'N/A';
+  const custAddress = o?.customer?.address || document.getElementById('modalCustAddress')?.innerText || 'N/A';
+  const subtotal = document.getElementById('modalBillSubtotal')?.innerText || `৳ ${(o?.payableOnDelivery || 0).toLocaleString()}`;
+  const codDue = document.getElementById('modalBillCod')?.innerText || `৳ ${(o?.payableOnDelivery || 0).toLocaleString()}`;
 
   // Populate 4R Template (Explicitly without bKash number & TrxID)
   document.getElementById('printInvId').innerText = orderId;
@@ -380,21 +448,33 @@ function triggerInvoicePrint() {
   document.getElementById('printSubtotal').innerText = subtotal;
   document.getElementById('printCodDue').innerText = codDue;
 
-  const modalItems = document.getElementById('modalItemsList');
   const tableBody = document.getElementById('printItemsTableBody');
   if (tableBody) {
     tableBody.innerHTML = '';
-    if (modalItems && modalItems.children.length > 0) {
-      Array.from(modalItems.children).forEach(child => {
-        const title = child.querySelector('p')?.innerText || 'Item';
-        const price = child.querySelector('span.font-bold')?.innerText || '';
+    const items = (o && o.items && o.items.length > 0) ? o.items : [];
+    if (items.length > 0) {
+      items.forEach(item => {
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td style="padding: 4px; border-bottom: 1px solid #eee;">${title}</td>
-          <td style="padding: 4px; text-align: right; border-bottom: 1px solid #eee; font-weight: bold;">${price}</td>
+          <td style="padding: 4px; border-bottom: 1px solid #eee;">${item.name} <span style="font-size: 9px; color: #555;">(Qty: ${item.qty || 1})</span></td>
+          <td style="padding: 4px; text-align: right; border-bottom: 1px solid #eee; font-weight: bold;">৳ ${((item.price || 0) * (item.qty || 1)).toLocaleString()}</td>
         `;
         tableBody.appendChild(row);
       });
+    } else {
+      const modalItems = document.getElementById('modalItemsList');
+      if (modalItems && modalItems.children.length > 0) {
+        Array.from(modalItems.children).forEach(child => {
+          const title = child.querySelector('h4')?.innerText || 'Item';
+          const price = child.querySelector('span.font-black')?.innerText || '';
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td style="padding: 4px; border-bottom: 1px solid #eee;">${title}</td>
+            <td style="padding: 4px; text-align: right; border-bottom: 1px solid #eee; font-weight: bold;">${price}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
     }
   }
 
