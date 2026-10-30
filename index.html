@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DeliBuy | Official Online Store</title>
-  
+
   <!-- Browser Tab Favicon -->
   <link rel="icon" type="image/jpeg" href="delibuy-logo.jpeg">
   <link rel="shortcut icon" type="image/jpeg" href="delibuy-logo.jpeg">
-  
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -35,11 +35,17 @@
 </head>
 <body class="bg-[#FFFBF2] text-slate-800 font-sans antialiased flex flex-col min-h-screen selection:bg-orange-200">
 
+  <!-- Scroll Progress Bar -->
+  <div id="scrollProgress"></div>
+
+  <a class="skip-link" href="#catalog-section">Skip to products</a>
+  <div class="announcement-bar"><span><i class="fa-solid fa-truck-fast" aria-hidden="true"></i> Everyday finds, delivered across Bangladesh</span><button onclick="openTrackModal()">Track your order <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></div>
+
   <!-- ================= NAVBAR ================= -->
-  <header class="sticky top-0 z-30 bg-[#0B0F19] text-white shadow-lg border-b border-slate-800">
+  <header id="mainHeader" class="sticky top-0 z-30 bg-[#0B0F19] text-white shadow-lg border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20 gap-4">
-        
+
         <!-- Brand Logo -->
         <a href="#" onclick="selectCategory('all'); return false;" class="flex items-center shrink-0">
           <img src="delibuy-logo.jpeg" alt="DeliBuy Logo" class="h-11 sm:h-12 w-auto rounded-lg shadow-md border border-slate-800 object-cover">
@@ -48,7 +54,7 @@
         <!-- Search Bar (Desktop) -->
         <div class="hidden md:flex flex-1 max-w-md mx-4">
           <div class="relative w-full flex items-center">
-            <input type="text" id="searchInput" placeholder="Search products..." 
+            <input type="text" aria-label="Search products" id="searchInput" placeholder="Search products..."
               class="w-full bg-[#161B26] border border-slate-700 text-white rounded-l-full py-2.5 pl-5 pr-4 focus:outline-none focus:border-brand-orange text-xs transition">
             <button onclick="handleSearch()" class="bg-brand-orange hover:bg-orange-600 text-white px-5 py-2.5 rounded-r-full flex items-center justify-center transition cursor-pointer">
               <i class="fa-solid fa-magnifying-glass text-xs"></i>
@@ -79,7 +85,7 @@
       <!-- Mobile Search Bar -->
       <div class="pb-3 md:hidden">
         <div class="relative w-full flex items-center">
-          <input type="text" id="mobileSearchInput" placeholder="Search products..." 
+          <input type="text" aria-label="Search products" id="mobileSearchInput" placeholder="Search products..."
             class="w-full bg-[#161B26] border border-slate-700 text-white rounded-l-full py-2 pl-4 pr-3 text-xs focus:outline-none focus:border-brand-orange">
           <button onclick="handleMobileSearch()" class="bg-brand-orange text-white px-4 py-2 rounded-r-full text-xs">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -90,28 +96,32 @@
   </header>
 
   <!-- ================= HERO SECTION ================= -->
-  <section class="bg-[#FFFBF2] py-12 md:py-16 px-4 sm:px-6 relative overflow-hidden border-b border-orange-100/60">
-    <div class="absolute top-10 left-1/4 w-72 h-72 bg-orange-200/40 rounded-full blur-3xl -z-0 pointer-events-none"></div>
-    <div class="absolute -bottom-10 right-10 w-96 h-96 bg-amber-200/40 rounded-full blur-3xl -z-0 pointer-events-none"></div>
+  <section id="store-hero" class="bg-[#FFFBF2] py-12 md:py-16 px-4 sm:px-6 relative overflow-hidden border-b border-orange-100/60">
+    <!-- Animated Background Blobs -->
+    <div class="absolute top-10 left-1/4 w-72 h-72 bg-orange-200/40 rounded-full blur-3xl -z-0 pointer-events-none hero-parallax-slow"></div>
+    <div class="absolute -bottom-10 right-10 w-96 h-96 bg-amber-200/40 rounded-full blur-3xl -z-0 pointer-events-none hero-parallax-fast"></div>
+
+    <!-- Floating Particles -->
+    <div id="heroParticles" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
 
     <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 relative z-10">
-      
+
       <!-- Left Hero Text -->
       <div class="lg:w-7/12 space-y-5 text-center lg:text-left">
-        <span class="inline-flex items-center gap-1.5 bg-[#FFF0E0] text-brand-orange border border-orange-200 text-xs font-bold px-3.5 py-1.5 rounded-full shadow-xs">
+        <span data-reveal="up" class="inline-flex items-center gap-1.5 bg-[#FFF0E0] text-brand-orange border border-orange-200 text-xs font-bold px-3.5 py-1.5 rounded-full shadow-xs">
           <span>🛍️</span> Welcome to DeliBuy
         </span>
 
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-[1.15] tracking-tight">
-          Everything You Need,<br>
-          <span class="text-brand-orange">Delivered to You.</span>
+        <h1 data-reveal="up" data-delay="100" class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-[1.15] tracking-tight">
+          Little finds.<br>
+          <span class="text-brand-orange">Big everyday joy.</span>
         </h1>
 
-        <p class="text-slate-600 text-sm sm:text-base max-w-lg mx-auto lg:mx-0 leading-relaxed font-normal">
-          Discover quality products at amazing prices. Shop easily, pay cash on delivery and get your order delivered right to your doorstep.
+        <p data-reveal="up" data-delay="200" class="text-slate-600 text-sm sm:text-base max-w-lg mx-auto lg:mx-0 leading-relaxed font-normal">
+          From lifestyle essentials to your next favorite gadget, discover something that makes your day. Explore the collection and let us bring it to your door.
         </p>
 
-        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+        <div data-reveal="up" data-delay="300" class="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
           <a href="#catalog-section" class="inline-flex items-center gap-2 bg-brand-orange hover:bg-orange-600 text-white px-7 py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-orange-500/20 transition transform hover:-translate-y-0.5">
             <span>Shop Now</span>
             <i class="fa-solid fa-arrow-right text-xs"></i>
@@ -123,26 +133,26 @@
       </div>
 
       <!-- Right Visual Feature with Floating Badges -->
-      <div class="lg:w-5/12 flex justify-center relative">
+      <div class="lg:w-5/12 flex justify-center relative" data-reveal="zoom" data-delay="200">
         <div class="relative flex items-center justify-center w-72 h-72 sm:w-96 sm:h-96">
-          <div class="absolute inset-0 bg-gradient-to-tr from-amber-400 to-brand-orange rounded-full opacity-90 shadow-2xl scale-95 animate-pulse duration-1000"></div>
+          <div class="absolute inset-0 bg-gradient-to-tr from-amber-400 to-brand-orange rounded-full opacity-90 shadow-2xl scale-95 hero-orbit"></div>
 
           <div class="relative z-10 bg-[#0B0F19] rounded-3xl p-6 shadow-2xl border-4 border-white/20 flex flex-col items-center justify-center w-48 h-48 sm:w-60 sm:h-60 transform -rotate-3 hover:rotate-0 transition duration-300">
             <img src="delibuy-logo.jpeg" alt="DeliBuy" class="h-20 sm:h-24 w-auto object-cover rounded-xl shadow-inner mb-2">
             <span class="text-white font-extrabold text-lg tracking-wider">Deli<span class="text-brand-orange">Buy</span></span>
           </div>
 
-          <div class="absolute top-4 -left-4 sm:left-0 z-20 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-lg border border-orange-100 flex items-center gap-2 text-xs font-bold text-slate-800 animate-bounce">
+          <div class="absolute top-4 -left-4 sm:left-0 z-20 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-lg border border-orange-100 flex items-center gap-2 text-xs font-bold text-slate-800 hero-float" data-reveal="left" data-delay="400">
             <span class="text-brand-orange">🚚</span>
             <span>Fast Delivery</span>
           </div>
 
-          <div class="absolute top-16 -right-6 sm:right-0 z-20 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-lg border border-orange-100 flex items-center gap-2 text-xs font-bold text-slate-800">
+          <div class="absolute top-16 -right-6 sm:right-0 z-20 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-lg border border-orange-100 flex items-center gap-2 text-xs font-bold text-slate-800" data-reveal="right" data-delay="500">
             <span class="text-amber-500">🛍️</span>
             <span>Cash on Delivery</span>
           </div>
 
-          <div class="absolute -bottom-2 z-20 bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg border border-orange-100 flex items-center gap-2 text-xs font-bold text-slate-800">
+          <div class="absolute -bottom-2 z-20 bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg border border-orange-100 flex items-center gap-2 text-xs font-bold text-slate-800" data-reveal="up" data-delay="600">
             <span class="text-brand-orange">⭐</span>
             <span>Quality Products</span>
           </div>
@@ -152,12 +162,40 @@
     </div>
   </section>
 
+  <!-- ================= SERVICE STRIP ================= -->
+  <section class="service-strip" aria-label="Shopping benefits" data-reveal="up">
+    <div data-reveal="up" data-delay="100"><i class="fa-solid fa-truck-fast" aria-hidden="true"></i><span><strong>Nationwide delivery</strong><small>From our store to your doorstep</small></span></div>
+    <div data-reveal="up" data-delay="200"><i class="fa-solid fa-wallet" aria-hidden="true"></i><span><strong>Cash on delivery</strong><small>Delivery fee paid in advance</small></span></div>
+    <div data-reveal="up" data-delay="300"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><span><strong>A closer look</strong><small>Explore product details before you buy</small></span></div>
+  </section>
+
+  <!-- ================= ANIMATED STATS / TRUST SECTION ================= -->
+  <section class="stats-section" aria-label="Store statistics">
+    <div class="stat-item" data-reveal="up" data-delay="100">
+      <div class="stat-number" data-count="500">0</div>
+      <div class="stat-label">Happy Customers</div>
+    </div>
+    <div class="stat-item" data-reveal="up" data-delay="200">
+      <div class="stat-number" data-count="150">0</div>
+      <div class="stat-label">Products Available</div>
+    </div>
+    <div class="stat-item" data-reveal="up" data-delay="300">
+      <div class="stat-number" data-count="64">0</div>
+      <div class="stat-label">Districts Covered</div>
+    </div>
+    <div class="stat-item" data-reveal="up" data-delay="400">
+      <div class="stat-number" data-count="99">0</div>
+      <div class="stat-label">Satisfaction Rate %</div>
+    </div>
+  </section>
+
   <!-- ================= SHOP BY CATEGORY SECTION ================= -->
   <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full" id="categories-section">
-    <div class="flex items-end justify-between mb-6">
+    <div class="flex items-end justify-between mb-6" data-reveal="up">
       <div>
         <span class="text-brand-orange text-xs font-extrabold uppercase tracking-wider block mb-1">Explore</span>
         <h2 class="text-2xl font-black text-slate-900">Shop by Category</h2>
+        <div class="section-divider"></div>
       </div>
       <a href="#catalog-section" onclick="selectCategory('all'); return false;" class="text-xs font-bold text-brand-orange hover:underline flex items-center gap-1">
         View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -171,10 +209,11 @@
 
   <!-- ================= POPULAR PRODUCTS CATALOG ================= -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full" id="catalog-section">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-orange-200/50 pb-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-orange-200/50 pb-4" data-reveal="up">
       <div>
         <span class="text-brand-orange text-xs font-extrabold uppercase tracking-wider block mb-1">Our Collection</span>
         <h3 id="currentCategoryTitle" class="text-2xl font-black text-slate-900">Popular Products</h3>
+        <div class="section-divider"></div>
       </div>
 
       <div id="categoryFilterPills" class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -182,6 +221,10 @@
       </div>
     </div>
 
+    <div class="catalog-toolbar">
+      <p id="resultCount" role="status" aria-live="polite">Loading the collection…</p>
+      <label for="productSort">Sort by <select id="productSort"><option value="featured">Featured</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option><option value="discount">Biggest savings</option></select></label>
+    </div>
     <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
       <!-- Injected via JavaScript -->
     </div>
@@ -190,7 +233,7 @@
   <!-- ================= PRODUCT DETAILS MODAL ================= -->
   <div id="productModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-4xl w-full overflow-hidden shadow-2xl relative flex flex-col md:flex-row max-h-[90vh]">
-      
+
       <button onclick="closeProductModal()" class="absolute top-4 right-4 z-20 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full w-9 h-9 flex items-center justify-center transition cursor-pointer">
         <i class="fa-solid fa-xmark text-lg"></i>
       </button>
@@ -405,7 +448,7 @@
 
       <div>
         <h3 class="text-2xl font-black text-slate-900">Order Confirmed!</h3>
-        <p class="text-slate-500 text-xs mt-1">ধন্যবাদ <strong id="successCustomerName" class="text-slate-800"></strong>! আপনার অর্ডার ও ডেলিভারি চার্জ পেমেন্ট সফলভাবে রিসিভ হয়েছে।</p>
+        <p class="text-slate-500 text-xs mt-1">ধন্যবাদ <strong id="successCustomerName" class="text-slate-800"></strong>! আপনার অর্ডার ও ডেলিভারি চার্জ পেমেন্ট সফলভাবে রিসিভ হয়েছে।</p>
       </div>
 
       <div class="bg-slate-50 p-4 rounded-2xl border border-dashed border-slate-300">
@@ -418,7 +461,7 @@
 
       <div class="text-[11px] text-slate-500 text-left bg-orange-50/60 p-3 rounded-xl border border-orange-100 space-y-1">
         <p>• <strong>Payment:</strong> ডেলিভারি চার্জ bKash-এ পরিশোধিত</p>
-        <p>• <strong>Cash on Delivery:</strong> বাকি মূল্য পার্সেল হাতে পেয়ে পরিশোধ করুন</p>
+        <p>• <strong>Cash on Delivery:</strong> বাকি মূল্য পার্সেল হাতে পেয়ে পরিশোধ করুন</p>
       </div>
 
       <div class="flex gap-2.5 pt-2">
@@ -464,13 +507,13 @@
   <footer class="bg-[#0B0F19] text-slate-400 border-t border-slate-800 mt-auto">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div class="space-y-4">
+        <div class="space-y-4" data-reveal="up" data-delay="100">
           <img src="delibuy-logo.jpeg" alt="DeliBuy" class="h-14 w-auto rounded-lg border border-slate-800">
           <p class="text-xs text-slate-400 leading-relaxed">
             DeliBuy delivers curated lifestyle and tech gear nationwide with authentic service and verified payments.
           </p>
-          
-          <!-- Social Media Icons (DeliBuy Facebook & Instagram) -->
+
+          <!-- Social Media Icons -->
           <div class="flex items-center space-x-3 pt-1">
             <a href="https://www.facebook.com/delibuy" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-[#1877F2] text-white flex items-center justify-center transition shadow" title="Facebook">
               <i class="fa-brands fa-facebook-f text-sm"></i>
@@ -481,7 +524,7 @@
           </div>
         </div>
 
-        <div>
+        <div data-reveal="up" data-delay="200">
           <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-brand-orange pl-2">Navigation</h4>
           <ul class="space-y-2 text-xs">
             <li><a href="#" onclick="selectCategory('all'); return false;" class="hover:text-brand-orange transition">All Products</a></li>
@@ -489,7 +532,7 @@
           </ul>
         </div>
 
-        <div>
+        <div data-reveal="up" data-delay="300">
           <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-brand-orange pl-2">Payment Policy</h4>
           <div class="space-y-2 text-xs">
             <div class="flex flex-wrap gap-2">
@@ -499,7 +542,7 @@
           </div>
         </div>
 
-        <div>
+        <div data-reveal="up" data-delay="400">
           <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-brand-orange pl-2">Contact Us</h4>
           <ul class="space-y-2.5 text-xs text-slate-400">
             <li class="flex items-start gap-2">
@@ -513,9 +556,8 @@
           </ul>
         </div>
       </div>
-
       <!-- Developer Signature Strip -->
-      <div class="border-t border-slate-800/80 mt-10 pt-6 text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="border-t border-slate-800/80 mt-10 pt-6 text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2" data-reveal="fade">
         <p>© 2026 DeliBuy. All rights reserved.</p>
         <p class="font-medium">
           Developed by <span class="text-brand-orange font-bold">KOFS</span>
@@ -525,6 +567,7 @@
     </div>
   </footer>
 
+  <button id="backToTop" class="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
   <script src="app.js"></script>
 </body>
 </html>

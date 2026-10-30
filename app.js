@@ -1,6 +1,6 @@
 /**
  * DeliBuy Customer Storefront Controller
- * Fully Cleaned: Zero Star Ratings, Dynamic Delivery Fees & Live Tracking
+ * Professional Edition: Scroll Animations, Parallax, Counters
  */
 
 const API_BASE = 'https://delibuy.onrender.com/api';
@@ -9,6 +9,8 @@ let products = [];
 let categories = [];
 let storeSettings = { insideDhakaFee: 60, outsideDhakaFee: 120, bkashNumber: '01516-597972' };
 let activeCategory = 'all';
+let searchQuery = '';
+let productSort = 'featured';
 let cart = JSON.parse(localStorage.getItem('delibuy_cart')) || [];
 let selectedDeliveryLocation = 'inside';
 let isSubmittingOrder = false;
@@ -18,11 +20,176 @@ let currentModalProduct = null;
 let currentModalQty = 1;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  await Promise.all([loadSettings(), loadCategories(), loadProducts()]);
   updateCartUI();
   setupEventListeners();
+  initScrollAnimations();
+  initScrollProgress();
+  initNavbarScroll();
+  initHeroParticles();
+  await Promise.all([loadSettings(), loadCategories(), loadProducts()]);
   setupZoomEffect();
 });
+
+// ================= SCROLL-REVEAL ANIMATION ENGINE =================
+
+function initScrollAnimations() {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) {
+    // Immediately show everything
+    document.querySelectorAll('[data-reveal]').forEach(el => {
+      el.classList.add('revealed');
+    });
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        observer.unobserve(entry.target); // Only animate once
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -40px 0px'
+  });
+
+  document.querySelectorAll('[data-reveal]').forEach(el => {
+    observer.observe(el);
+  });
+
+  // Also observe dynamically added elements (product cards, category cards)
+  window._scrollObserver = observer;
+}
+
+// Observe dynamically injected elements
+function observeNewElements(container) {
+  if (!window._scrollObserver) return;
+  container.querySelectorAll('[data-reveal]').forEach(el => {
+    if (!el.classList.contains('revealed')) {
+      window._scrollObserver.observe(el);
+    }
+  });
+}
+
+// ================= SCROLL PROGRESS BAR =================
+
+function initScrollProgress() {
+  const bar = document.getElementById('scrollProgress');
+  if (!bar) return;
+
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    bar.style.width = progress + '%';
+  }, { passive: true });
+}
+
+// ================= NAVBAR SHRINK ON SCROLL =================
+
+function initNavbarScroll() {
+  const header = document.getElementById('mainHeader');
+  if (!header) return;
+
+  let lastScroll = 0;
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    if (scrollY > 60) {
+      header.classList.add('header-scrolled');
+    } else {
+      header.classList.remove('header-scrolled');
+    }
+    lastScroll = scrollY;
+  }, { passive: true });
+}
+
+// ================= HERO FLOATING PARTICLES =================
+
+function initHeroParticles() {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) return;
+
+  const container = document.getElementById('heroParticles');
+  if (!container) return;
+
+  const colors = ['#ff6b2c', '#ffc874', '#9273eb', '#d24b71', '#ff8057'];
+
+  for (let i = 0; i < 15; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'floating-particle';
+    const size = Math.random() * 6 + 3;
+    const left = Math.random() * 100;
+    const delay = Math.random() * 8;
+    const duration = Math.random() * 6 + 8;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+
+    particle.style.cssText = `
+      width: ${size}px;
+      height: ${size}px;
+      left: ${left}%;
+      bottom: -10px;
+      background: ${color};
+      animation-delay: ${delay}s;
+      animation-duration: ${duration}s;
+    `;
+    container.appendChild(particle);
+  }
+}
+
+// ================= ANIMATED COUNTER =================
+
+function animateCounter(element, target) {
+  const duration = 2000; // ms
+  const start = 0;
+  const increment = target / (duration / 16);
+  let current = start;
+
+  const suffix = element.closest('.stat-item')?.querySelector('.stat-label')?.textContent.includes('%') ? '%' : '+';
+
+  function update() {
+    current += increment;
+    if (current >= target) {
+      current = target;
+      element.textContent = target.toLocaleString() + suffix;
+      return;
+    }
+    element.textContent = Math.floor(current).toLocaleString() + suffix;
+    requestAnimationFrame(update);
+  }
+
+  requestAnimationFrame(update);
+}
+
+function initCounters() {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const counters = document.querySelectorAll('[data-count]');
+  if (prefersReducedMotion) {
+    counters.forEach(el => {
+      const target = parseInt(el.dataset.count);
+      const suffix = el.closest('.stat-item')?.querySelector('.stat-label')?.textContent.includes('%') ? '%' : '+';
+      el.textContent = target.toLocaleString() + suffix;
+    });
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const target = parseInt(entry.target.dataset.count);
+        animateCounter(entry.target, target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  counters.forEach(el => observer.observe(el));
+}
+
+// Initialize counters after DOM is ready
+document.addEventListener('DOMContentLoaded', initCounters);
+
 
 // ================= LOAD INITIAL DATA =================
 async function loadSettings() {
@@ -30,7 +197,7 @@ async function loadSettings() {
     const res = await fetch(`${API_BASE}/settings`);
     if (res.ok) {
       storeSettings = await res.json();
-      
+
       const bkashEl = document.getElementById('checkoutBkashTarget');
       if (bkashEl) bkashEl.innerText = storeSettings.bkashNumber || '01516-597972';
 
@@ -60,12 +227,17 @@ async function loadCategories() {
 async function loadProducts() {
   try {
     const res = await fetch(`${API_BASE}/products`);
+    if (!res.ok) throw new Error('Catalog unavailable');
     if (res.ok) {
       products = await res.json();
       renderProducts();
     }
   } catch (e) {
     console.error('Products load error:', e);
+    const count = document.getElementById('resultCount');
+    if (count) count.textContent = 'Collection unavailable';
+    const grid = document.getElementById('productGrid');
+    if (grid) grid.innerHTML = '<div class="col-span-full py-16 text-center text-slate-500"><p>We couldn\u2019t load the collection.</p><button type="button" onclick="loadProducts()" class="mt-4 text-brand-orange font-bold">Try again <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></div>';
   }
 }
 
@@ -85,19 +257,24 @@ function renderCategoryCards() {
     'watches': 'fa-solid fa-clock'
   };
 
-  container.innerHTML = categories.map(cat => {
+  container.innerHTML = categories.map((cat, index) => {
     const icon = iconMap[cat.id] || 'fa-solid fa-tag';
+    const delay = (index + 1) * 100;
     return `
-      <div onclick="selectCategory('${cat.id}')" 
-        class="bg-white p-4 rounded-2xl border border-orange-100/80 shadow-xs hover:shadow-md hover:border-brand-orange/40 transition cursor-pointer flex flex-col items-center text-center group">
+      <button type="button" aria-pressed="${activeCategory === cat.id}" onclick="selectCategory('${cat.id}')"
+        data-reveal="up" data-delay="${Math.min(delay, 600)}"
+        class="category-card bg-white p-4 rounded-2xl border border-orange-100/80 shadow-xs hover:shadow-md hover:border-brand-orange/40 transition cursor-pointer flex flex-col items-center text-center group">
         <div class="w-12 h-12 rounded-full bg-orange-50 group-hover:bg-brand-orange text-brand-orange group-hover:text-white flex items-center justify-center text-lg mb-2.5 transition shadow-inner">
           <i class="${icon}"></i>
         </div>
         <h4 class="font-bold text-xs text-slate-800 group-hover:text-brand-orange transition">${cat.name}</h4>
-        <span class="text-[10px] text-slate-400 mt-0.5">Explore Collection</span>
-      </div>
+        <span class="text-[10px] text-slate-400 mt-0.5">Explore Collection <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+      </button>
     `;
   }).join('');
+
+  // Re-observe new elements
+  observeNewElements(container);
 }
 
 function renderCategoryFilterPills() {
@@ -106,8 +283,8 @@ function renderCategoryFilterPills() {
 
   container.innerHTML = categories.map(cat => `
     <button onclick="selectCategory('${cat.id}')" class="px-4 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap cursor-pointer ${
-      activeCategory === cat.id 
-      ? 'bg-brand-orange text-white shadow-md' 
+      activeCategory === cat.id
+      ? 'bg-brand-orange text-white shadow-md'
       : 'bg-white text-slate-600 hover:bg-orange-50 border border-orange-100'
     }">
       ${cat.name}
@@ -118,6 +295,7 @@ function renderCategoryFilterPills() {
 function selectCategory(catId) {
   activeCategory = catId;
   renderCategoryFilterPills();
+  renderCategoryCards();
   renderProducts();
 
   const activeCat = categories.find(c => c.id === catId);
@@ -139,29 +317,29 @@ function handleMobileSearch() {
 }
 
 function executeSearch(query) {
-  const titleEl = document.getElementById('currentCategoryTitle');
-  if (!query) {
-    if (titleEl) titleEl.innerText = 'Popular Products';
-    renderProducts();
-    return;
-  }
-
-  if (titleEl) titleEl.innerText = `Search: "${query}"`;
-  const filtered = products.filter(p => 
-    p.name.toLowerCase().includes(query) || 
-    p.category.toLowerCase().includes(query) ||
-    (p.description && p.description.toLowerCase().includes(query))
-  );
-
-  renderProductGrid(filtered);
+  searchQuery = query.trim().toLowerCase();
+  ['searchInput', 'mobileSearchInput'].forEach(id => {
+    const input = document.getElementById(id);
+    if (input && input.value.toLowerCase() !== searchQuery) input.value = query;
+  });
+  renderProducts();
 }
 
-// ================= PRODUCT CARD DISPLAY (NO RATINGS) =================
 function renderProducts() {
-  let filtered = activeCategory === 'all' 
-    ? products 
-    : products.filter(p => p.category === activeCategory);
-
+  let filtered = products.filter(p =>
+    (activeCategory === 'all' || p.category === activeCategory) &&
+    (!searchQuery || [p.name, p.category, p.description].some(value =>
+      String(value || '').toLowerCase().includes(searchQuery)))
+  );
+  if (productSort === 'price-low') filtered.sort((a, b) => a.discountPrice - b.discountPrice);
+  if (productSort === 'price-high') filtered.sort((a, b) => b.discountPrice - a.discountPrice);
+  if (productSort === 'discount') {
+    const saving = p => p.originalPrice > 0 ? 1 - p.discountPrice / p.originalPrice : 0;
+    filtered.sort((a, b) => saving(b) - saving(a));
+  }
+  const title = document.getElementById('currentCategoryTitle');
+  if (title) title.innerText = searchQuery ? `Search: "${searchQuery}"` :
+    categories.find(c => c.id === activeCategory && c.id !== 'all')?.name || 'Popular Products';
   renderProductGrid(filtered);
 }
 
@@ -169,20 +347,27 @@ function renderProductGrid(items) {
   const grid = document.getElementById('productGrid');
   if (!grid) return;
 
+  const count = document.getElementById('resultCount');
+  if (count) count.textContent = `${items.length} product${items.length === 1 ? '' : 's'} to explore`;
+
   if (items.length === 0) {
-    grid.innerHTML = `<div class="col-span-full py-16 text-center text-slate-400 font-bold text-sm">No products found in this category.</div>`;
+    grid.innerHTML = `<div class="col-span-full py-16 text-center text-slate-400 font-bold text-sm">No matching products found.<br><span class="empty-hint">Try another search or explore a different category.</span></div>`;
     return;
   }
 
-  grid.innerHTML = items.map(p => {
+  grid.innerHTML = items.map((p, index) => {
     const mainImg = p.images && p.images.length > 0 ? p.images[0] : 'https://placehold.co/400';
     const hasDiscount = p.originalPrice && p.originalPrice > p.discountPrice;
     const discountPercent = hasDiscount ? Math.round(((p.originalPrice - p.discountPrice) / p.originalPrice) * 100) : 0;
     const isOutOfStock = (p.stock || 0) <= 0;
 
+    // Stagger animation: each card gets a slight delay
+    const delay = Math.min((index % 4) * 100 + 100, 400);
+
     return `
-      <div class="bg-white rounded-2xl border border-orange-100/80 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group relative">
-        
+      <div class="product-card bg-white rounded-2xl border border-orange-100/80 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group relative"
+           data-reveal="up" data-delay="${delay}">
+
         <!-- Discount Tag -->
         ${hasDiscount ? `
           <span class="absolute top-3 left-3 z-10 bg-brand-orange text-white text-[11px] font-black px-2.5 py-1 rounded-lg shadow-sm">
@@ -191,16 +376,16 @@ function renderProductGrid(items) {
         ` : ''}
 
         <!-- Product Image -->
-        <div onclick="openProductModal('${p._id}')" class="h-48 sm:h-52 bg-slate-50 flex items-center justify-center p-4 cursor-pointer overflow-hidden relative">
-          <img src="${mainImg}" alt="${p.name}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300">
+        <button type="button" aria-label="View product details" onclick="openProductModal('${p._id}')" class="product-image h-48 sm:h-52 bg-slate-50 flex items-center justify-center p-4 cursor-pointer overflow-hidden relative">
+          <img loading="lazy" src="${mainImg}" alt="${p.name}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300">
           ${isOutOfStock ? `
             <div class="absolute inset-0 bg-slate-950/60 flex items-center justify-center">
               <span class="bg-red-600 text-white text-[11px] font-black uppercase px-3 py-1.5 rounded-lg shadow">Out of Stock</span>
             </div>
           ` : ''}
-        </div>
+        </button>
 
-        <!-- Product Meta (Clean without any Star Ratings) -->
+        <!-- Product Meta -->
         <div class="p-4 flex-1 flex flex-col justify-between">
           <div class="mb-3">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">${p.category}</span>
@@ -219,7 +404,7 @@ function renderProductGrid(items) {
             </div>
 
             <!-- Round Orange Add to Cart Button -->
-            <button onclick="event.stopPropagation(); addToCart('${p._id}')" ${isOutOfStock ? 'disabled' : ''} 
+            <button aria-label="Add to cart" onclick="event.stopPropagation(); addToCart('${p._id}')" ${isOutOfStock ? 'disabled' : ''}
               class="w-9 h-9 rounded-full ${isOutOfStock ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-brand-orange hover:bg-orange-600 text-white shadow-md hover:shadow-lg active:scale-90 cursor-pointer'} flex items-center justify-center transition">
               <i class="fa-solid fa-cart-shopping text-xs"></i>
             </button>
@@ -229,6 +414,9 @@ function renderProductGrid(items) {
       </div>
     `;
   }).join('');
+
+  // Re-observe new product cards for scroll animations
+  observeNewElements(grid);
 }
 
 // ================= PRODUCT DETAILS MODAL =================
@@ -653,6 +841,28 @@ function getStatusClass(status) {
 
 // ================= EVENT LISTENERS =================
 function setupEventListeners() {
+  ['searchInput', 'mobileSearchInput'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', event => executeSearch(event.target.value));
+  });
+  document.getElementById('productSort')?.addEventListener('change', event => {
+    productSort = event.target.value;
+    renderProducts();
+  });
+
+  // Back to top with smooth animation
+  const topButton = document.getElementById('backToTop');
+  window.addEventListener('scroll', () => {
+    if (topButton) {
+      if (window.scrollY > 500) {
+        topButton.classList.add('visible');
+        topButton.removeAttribute('hidden');
+      } else {
+        topButton.classList.remove('visible');
+      }
+    }
+  }, { passive: true });
+  topButton?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' }));
+
   document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') handleSearch();
   });

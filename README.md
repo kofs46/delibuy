@@ -73,3 +73,9 @@ npm start
 
 - **Khandaker Omar Fayes Shabbir**
 - **GitHub:** [@kofs46](https://github.com/kofs46)
+
+## Storefront design update
+
+The customer storefront uses `index.html` for layout, `style.css` for responsive styling, and `storefront-motion.js` for scroll reveals, hero parallax, and reading progress. Existing shopping logic remains in `app.js`.
+
+Open `index.html` with VS Code Live Server to preview. The storefront uses the existing hosted API; Google Fonts, Tailwind, Font Awesome, and the hero photograph require internet access. Reduced-motion preferences automatically disable movement.
