@@ -16,7 +16,7 @@
         extend: {
           colors: {
             brand: {
-              orange: '#FF6B2C',
+              orange: '#FF1E56', pink: '#FF3B69', rind: '#10B981',
               dark: '#0B0F19',
               light: '#FFF5EB',
             },
@@ -50,8 +50,8 @@
       --ed-muted: #A09B93;
       --ed-ink: #1A1A1A;
       --ed-subtle: #F2F0ED;
-      --ed-accent: #FF6B2C;
-      --ed-accent-soft: #FFF0E5;
+      --ed-accent: #FF1E56;
+      --ed-accent-soft: #FFF0F3;
       --ed-sidebar: #101820;
     }
 
@@ -552,6 +552,48 @@
 
             <div id="imagePreviewContainer" class="flex flex-wrap gap-2.5 empty:hidden pt-1"></div>
 
+            <!-- COLOR-BASED QUANTITIES -->
+            <div class="bg-rose-50/40 p-4 rounded-xl border border-rose-200/80 space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-palette text-brand-orange"></i> Color-Based Product Quantities
+                  </h4>
+                  <p class="text-[10px] text-slate-500">Set color variants and specific stock available for each color</p>
+                </div>
+                <button type="button" onclick="addColorRow('add')" class="text-xs font-bold text-white bg-brand-orange hover:bg-rose-600 px-3 py-1 rounded-lg transition cursor-pointer shadow-xs flex items-center gap-1">
+                  <i class="fa-solid fa-plus text-[10px]"></i> Add Color
+                </button>
+              </div>
+              <div id="addColorsContainer" class="space-y-2 empty:hidden"></div>
+            </div>
+
+            <!-- SIZE-BASED QUANTITIES -->
+            <div class="bg-emerald-50/40 p-4 rounded-xl border border-emerald-200/80 space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-ruler-combined text-emerald-600"></i> Size-Based Product Quantities
+                  </h4>
+                  <p class="text-[10px] text-slate-500">Configure size variants (e.g. S, M, L, XL or 40, 41, 42) and stock per size</p>
+                </div>
+                <button type="button" onclick="addSizeRow('add')" class="text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-1 rounded-lg transition cursor-pointer shadow-xs flex items-center gap-1">
+                  <i class="fa-solid fa-plus text-[10px]"></i> Add Size
+                </button>
+              </div>
+              <div class="flex flex-wrap gap-1.5 text-[10px] font-bold text-slate-600 items-center">
+                <span>Quick Add:</span>
+                <button type="button" onclick="addQuickSize('add', 'S')" class="bg-white border px-2 py-0.5 rounded hover:border-emerald-500 cursor-pointer">+ S</button>
+                <button type="button" onclick="addQuickSize('add', 'M')" class="bg-white border px-2 py-0.5 rounded hover:border-emerald-500 cursor-pointer">+ M</button>
+                <button type="button" onclick="addQuickSize('add', 'L')" class="bg-white border px-2 py-0.5 rounded hover:border-emerald-500 cursor-pointer">+ L</button>
+                <button type="button" onclick="addQuickSize('add', 'XL')" class="bg-white border px-2 py-0.5 rounded hover:border-emerald-500 cursor-pointer">+ XL</button>
+                <button type="button" onclick="addQuickSize('add', 'XXL')" class="bg-white border px-2 py-0.5 rounded hover:border-emerald-500 cursor-pointer">+ XXL</button>
+                <button type="button" onclick="addQuickSize('add', 'Free Size')" class="bg-white border px-2 py-0.5 rounded hover:border-emerald-500 cursor-pointer">+ Free Size</button>
+              </div>
+              <div id="addSizesContainer" class="space-y-2 empty:hidden"></div>
+            </div>
+
+
             <div>
               <label class="ed-label">Product Details & Specs *</label>
               <textarea id="prodDescription" rows="3" required class="ed-input"></textarea>
@@ -787,6 +829,48 @@
         </div>
 
         <div id="editImagePreviewContainer" class="flex flex-wrap gap-2.5 pt-1"></div>
+
+        <!-- EDIT COLOR-BASED QUANTITIES -->
+        <div class="bg-rose-50/40 p-4 rounded-xl border border-rose-200/80 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                <i class="fa-solid fa-palette text-brand-orange"></i> Color-Based Product Quantities
+              </h4>
+              <p class="text-[10px] text-slate-500">Edit colors and individual quantity in stock</p>
+            </div>
+            <button type="button" onclick="addColorRow('edit')" class="text-xs font-bold text-white bg-brand-orange hover:bg-rose-600 px-3 py-1 rounded-lg transition cursor-pointer shadow-xs flex items-center gap-1">
+              <i class="fa-solid fa-plus text-[10px]"></i> Add Color
+            </button>
+          </div>
+          <div id="editColorsContainer" class="space-y-2 empty:hidden"></div>
+        </div>
+
+        <!-- EDIT SIZE-BASED QUANTITIES -->
+        <div class="bg-emerald-50/40 p-4 rounded-xl border border-emerald-200/80 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                <i class="fa-solid fa-ruler-combined text-emerald-600"></i> Size-Based Product Quantities
+              </h4>
+              <p class="text-[10px] text-slate-500">Edit sizes and individual quantity in stock</p>
+            </div>
+            <button type="button" onclick="addSizeRow('edit')" class="text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-1 rounded-lg transition cursor-pointer shadow-xs flex items-center gap-1">
+              <i class="fa-solid fa-plus text-[10px]"></i> Add Size
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-1.5 text-[10px] font-bold text-slate-600 items-center">
+            <span>Quick Add:</span>
+            <button type="button" onclick="addQuickSize('edit', 'S')" class="bg-white border px-2 py-0.5 rounded hover:border-emerald-500 cursor-pointer">+ S</button>
+            <button type="button" onclick="addQuickSize('edit', 'M')" class="bg-white border px-2 py-0.5 rounded hover:border-emerald-500 cursor-pointer">+ M</button>
+            <button type="button" onclick="addQuickSize('edit', 'L')" class="bg-white border px-2 py-0.5 rounded hover:border-emerald-500 cursor-pointer">+ L</button>
+            <button type="button" onclick="addQuickSize('edit', 'XL')" class="bg-white border px-2 py-0.5 rounded hover:border-emerald-500 cursor-pointer">+ XL</button>
+            <button type="button" onclick="addQuickSize('edit', 'XXL')" class="bg-white border px-2 py-0.5 rounded hover:border-emerald-500 cursor-pointer">+ XXL</button>
+            <button type="button" onclick="addQuickSize('edit', 'Free Size')" class="bg-white border px-2 py-0.5 rounded hover:border-emerald-500 cursor-pointer">+ Free Size</button>
+          </div>
+          <div id="editSizesContainer" class="space-y-2 empty:hidden"></div>
+        </div>
+
 
         <div>
           <label class="ed-label">Product Details & Specs *</label>

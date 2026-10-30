@@ -1,3 +1,82 @@
+
+// ================= COLOR & SIZE VARIANTS CONTROLLER =================
+
+function addColorRow(type, data = { name: '', code: '#FF1E56', stock: 10 }) {
+  const container = document.getElementById(type === 'add' ? 'addColorsContainer' : 'editColorsContainer');
+  if (!container) return;
+
+  const rowId = 'color_row_' + Math.random().toString(36).substring(2, 9);
+  const row = document.createElement('div');
+  row.id = rowId;
+  row.className = 'flex items-center gap-2 p-2 bg-white rounded-xl border border-rose-100 shadow-2xs';
+  row.innerHTML = `
+    <input type="color" value="${data.code || '#FF1E56'}" class="w-8 h-8 rounded-lg cursor-pointer border-0 p-0 bg-transparent shrink-0">
+    <input type="text" placeholder="Color Name (e.g. Ruby Red)" value="${data.name || ''}" class="flex-1 border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-brand-orange">
+    <div class="flex items-center gap-1 shrink-0">
+      <span class="text-[10px] text-slate-400 font-bold">Qty:</span>
+      <input type="number" min="0" placeholder="Stock" value="${data.stock ?? 10}" class="w-16 border rounded-lg px-2 py-1.5 text-xs text-center font-bold focus:outline-none focus:border-brand-orange">
+    </div>
+    <button type="button" onclick="document.getElementById('${rowId}').remove()" class="text-rose-400 hover:text-rose-600 p-1 cursor-pointer transition">
+      <i class="fa-solid fa-trash-can text-xs"></i>
+    </button>
+  `;
+  container.appendChild(row);
+}
+
+function addSizeRow(type, data = { name: '', stock: 10 }) {
+  const container = document.getElementById(type === 'add' ? 'addSizesContainer' : 'editSizesContainer');
+  if (!container) return;
+
+  const rowId = 'size_row_' + Math.random().toString(36).substring(2, 9);
+  const row = document.createElement('div');
+  row.id = rowId;
+  row.className = 'flex items-center gap-2 p-2 bg-white rounded-xl border border-emerald-100 shadow-2xs';
+  row.innerHTML = `
+    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 font-black text-xs flex items-center justify-center shrink-0 border border-emerald-200">
+      <i class="fa-solid fa-tag text-[10px]"></i>
+    </div>
+    <input type="text" placeholder="Size (e.g. M, L, XL or 42)" value="${data.name || ''}" class="flex-1 border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-600">
+    <div class="flex items-center gap-1 shrink-0">
+      <span class="text-[10px] text-slate-400 font-bold">Qty:</span>
+      <input type="number" min="0" placeholder="Stock" value="${data.stock ?? 10}" class="w-16 border rounded-lg px-2 py-1.5 text-xs text-center font-bold focus:outline-none focus:border-emerald-600">
+    </div>
+    <button type="button" onclick="document.getElementById('${rowId}').remove()" class="text-rose-400 hover:text-rose-600 p-1 cursor-pointer transition">
+      <i class="fa-solid fa-trash-can text-xs"></i>
+    </button>
+  `;
+  container.appendChild(row);
+}
+
+function addQuickSize(type, sizeName) {
+  addSizeRow(type, { name: sizeName, stock: 10 });
+}
+
+function collectFormVariants(type) {
+  const colorContainer = document.getElementById(type === 'add' ? 'addColorsContainer' : 'editColorsContainer');
+  const sizeContainer = document.getElementById(type === 'add' ? 'addSizesContainer' : 'editSizesContainer');
+
+  const colors = [];
+  if (colorContainer) {
+    colorContainer.querySelectorAll('div[id^="color_row_"]').forEach(row => {
+      const code = row.querySelector('input[type="color"]')?.value || '#FF1E56';
+      const name = row.querySelector('input[type="text"]')?.value.trim() || 'Custom Color';
+      const stock = parseInt(row.querySelector('input[type="number"]')?.value) || 0;
+      colors.push({ name, code, stock });
+    });
+  }
+
+  const sizes = [];
+  if (sizeContainer) {
+    sizeContainer.querySelectorAll('div[id^="size_row_"]').forEach(row => {
+      const name = row.querySelector('input[type="text"]')?.value.trim() || 'Standard';
+      const stock = parseInt(row.querySelector('input[type="number"]')?.value) || 0;
+      sizes.push({ name, stock });
+    });
+  }
+
+  return { colors, sizes };
+}
+
 /**
  * DeliBuy Operations & RBAC Controller
  * Restricts UI by role, enables order cancellation at every stage until delivery,
@@ -369,6 +448,22 @@ function openOrderDetailModal(orderId) { currentInspectedOrder = allOrders.find(
                 <div class="flex items-center gap-2 flex-wrap">
                   <span class="text-[9px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md border border-slate-200/60">${category}</span>
                   ${stockInfo}
+                  ${item.size ? `
+                    <span class="inline-flex items-center gap-1 text-[9px] font-black bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-200">
+                      <i class="fa-solid fa-ruler-combined text-[8px]"></i> Size: ${item.size}
+                    </span>
+                  ` : ''}
+                  ${item.color ? `
+                    <span class="inline-flex items-center gap-1 text-[9px] font-black bg-rose-50 text-slate-800 px-2 py-0.5 rounded-md border border-rose-200">
+                      <span class="w-2 h-2 rounded-full inline-block shadow-xs" style="background:${item.color.code || item.color.hex || '#FF1E56'}"></span>
+                      ${item.color.name}
+                    </span>
+                  ` : ''}
+                  ${item.customization ? `
+                    <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      ✍️ "${item.customization}"
+                    </span>
+                  ` : ''}
                 </div>
                 <h4 class="font-bold text-slate-800 text-xs sm:text-sm line-clamp-2 leading-snug">${item.name}</h4>
                 <div class="flex items-center gap-2.5 text-xs text-slate-500 flex-wrap">
@@ -659,6 +754,20 @@ function openEditProductModal(productId) {
     container.innerHTML = editUploadedImages.map(img => `
       <img src="${img}" class="w-14 h-14 object-cover rounded-xl border bg-white shadow-xs">
     `).join('');
+  }
+
+  // Populate Edit Colors
+  const editCContainer = document.getElementById('editColorsContainer');
+  if (editCContainer) {
+    editCContainer.innerHTML = '';
+    (prod.colors || []).forEach(c => addColorRow('edit', c));
+  }
+
+  // Populate Edit Sizes
+  const editSContainer = document.getElementById('editSizesContainer');
+  if (editSContainer) {
+    editSContainer.innerHTML = '';
+    (prod.sizes || []).forEach(s => addSizeRow('edit', s));
   }
 
   document.getElementById('editProductModal')?.classList.remove('hidden');

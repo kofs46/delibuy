@@ -44,6 +44,15 @@ const productSchema = new mongoose.Schema({
   originalPrice: { type: Number, required: true },
   discountPrice: { type: Number, required: true },
   stock: { type: Number, default: 0 },
+  colors: [{
+    name: { type: String },
+    code: { type: String },
+    stock: { type: Number, default: 0 }
+  }],
+  sizes: [{
+    name: { type: String },
+    stock: { type: Number, default: 0 }
+  }],
   images: [{ type: String }],
   description: { type: String },
   createdAt: { type: Date, default: Date.now }
@@ -74,7 +83,10 @@ const orderSchema = new mongoose.Schema({
     name: String,
     price: Number,
     image: String,
-    qty: Number
+    qty: Number,
+    color: mongoose.Schema.Types.Mixed,
+    size: String,
+    customization: String
   }],
   status: {
     type: String,
