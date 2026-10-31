@@ -21,11 +21,11 @@
         extend: {
           colors: {
             brand: {
-              orange: '#FF1E56',
-              pink: '#FF3B69',
-              coral: '#FF5376',
-              mint: '#10B981',
-              rindDark: '#059669',
+              orange: '#E10000',
+              pink: '#FFAA7C',
+              coral: '#FFAA7C',
+              mint: '#A0EE73',
+              rindDark: '#76CD42',
               dark: '#0B1315',
               cream: '#FFFDF8',
               card: '#FFFFFF',
@@ -46,12 +46,10 @@
   <!-- Interactive Scroll Progress Bar -->
   <div id="scrollProgress"></div>
 
-  <a class="skip-link" href="#catalog-section">Skip to products</a>
-
   <!-- Top Announcement Bar -->
   <div class="announcement-bar bg-gradient-to-r from-emerald-950 via-slate-900 to-rose-950 text-white px-4 py-2.5 text-xs font-semibold flex items-center justify-between border-b border-rose-500/20">
     <span class="flex items-center gap-2">
-      <i class="fa-solid fa-truck-fast text-[#10B981]"></i>
+      <i class="fa-solid fa-truck-fast text-[#A0EE73]"></i>
       <span>Everyday curated essentials delivered nationwide across Bangladesh</span>
     </span>
     <button onclick="openTrackModal()" class="hover:text-rose-400 font-bold transition flex items-center gap-1.5 cursor-pointer">
@@ -73,15 +71,15 @@
               <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
             </span>
           </div>
-          <span class="text-xl font-black tracking-tight hidden sm:inline text-white">Deli<span class="text-[#FF1E56]">Buy</span></span>
+          <span class="text-xl font-black tracking-tight hidden sm:inline text-white">Deli<span class="text-[#E10000]">Buy</span></span>
         </a>
 
         <!-- Search Bar (Desktop) -->
         <div class="hidden md:flex flex-1 max-w-md mx-4">
           <div class="relative w-full flex items-center">
             <input type="text" aria-label="Search products" id="searchInput" placeholder="Search by product name, category, or spec..."
-              class="w-full bg-[#162227] border border-slate-700/80 text-white rounded-l-full py-2.5 pl-5 pr-4 focus:outline-none focus:border-[#FF1E56] text-xs transition placeholder-slate-400">
-            <button onclick="handleSearch()" class="bg-gradient-to-r from-[#FF1E56] to-[#FF5376] hover:opacity-90 text-white px-5 py-2.5 rounded-r-full flex items-center justify-center transition cursor-pointer shadow-md shadow-rose-950">
+              class="w-full bg-[#162227] border border-slate-700/80 text-white rounded-l-full py-2.5 pl-5 pr-4 focus:outline-none focus:border-[#E10000] text-xs transition placeholder-slate-400">
+            <button onclick="handleSearch()" class="bg-gradient-to-r from-[#E10000] to-[#FFAA7C] hover:opacity-90 text-white px-5 py-2.5 rounded-r-full flex items-center justify-center transition cursor-pointer shadow-md shadow-rose-950">
               <i class="fa-solid fa-magnifying-glass text-xs"></i>
             </button>
           </div>
@@ -90,19 +88,19 @@
         <!-- Navigation Links & Cart Actions -->
         <div class="flex items-center space-x-3 sm:space-x-6">
           <nav class="hidden lg:flex items-center space-x-6 text-xs font-bold text-slate-300">
-            <a href="#" onclick="selectCategory('all'); return false;" class="hover:text-[#FF1E56] transition">Home</a>
-            <a href="#catalog-section" class="hover:text-[#FF1E56] transition">Shop</a>
-            <a href="#categories-section" class="hover:text-[#FF1E56] transition">Categories</a>
-            <button onclick="openTrackModal()" class="hover:text-[#10B981] transition cursor-pointer flex items-center gap-1.5">
-              <i class="fa-solid fa-truck-fast text-[#10B981]"></i> Track
+            <a href="#" onclick="selectCategory('all'); return false;" class="hover:text-[#E10000] transition">Home</a>
+            <a href="#catalog-section" class="hover:text-[#E10000] transition">Shop</a>
+            <a href="#categories-section" class="hover:text-[#E10000] transition">Categories</a>
+            <button onclick="openTrackModal()" class="hover:text-[#A0EE73] transition cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-truck-fast text-[#A0EE73]"></i> Track
             </button>
           </nav>
 
           <!-- Shopping Cart Trigger Button -->
-          <button id="navCartBtn" onclick="openCartDrawer()" class="relative flex items-center gap-2 px-4 py-2 border border-rose-500/40 rounded-full hover:border-[#FF1E56] bg-gradient-to-r from-[#162227] to-[#1C2C32] text-white transition focus:outline-none cursor-pointer group shadow-lg">
-            <i class="fa-solid fa-cart-shopping text-sm text-[#FF1E56] group-hover:scale-110 transition-transform"></i>
+          <button id="navCartBtn" onclick="openCartDrawer()" class="relative flex items-center gap-2 px-4 py-2 border border-rose-500/40 rounded-full hover:border-[#E10000] bg-gradient-to-r from-[#162227] to-[#1C2C32] text-white transition focus:outline-none cursor-pointer group shadow-lg">
+            <i class="fa-solid fa-cart-shopping text-sm text-[#E10000] group-hover:scale-110 transition-transform"></i>
             <span class="text-xs font-extrabold hidden sm:inline">Cart</span>
-            <span id="cartCountBadge" class="bg-gradient-to-r from-[#FF1E56] to-[#FF5376] text-white text-[10px] font-black rounded-full h-5 w-5 flex items-center justify-center shadow-md shadow-rose-900">
+            <span id="cartCountBadge" class="bg-gradient-to-r from-[#E10000] to-[#FFAA7C] text-white text-[10px] font-black rounded-full h-5 w-5 flex items-center justify-center shadow-md shadow-rose-900">
               0
             </span>
           </button>
@@ -113,8 +111,8 @@
       <div class="pb-3 md:hidden">
         <div class="relative w-full flex items-center">
           <input type="text" aria-label="Search products" id="mobileSearchInput" placeholder="Search products..."
-            class="w-full bg-[#162227] border border-slate-700 text-white rounded-l-full py-2 pl-4 pr-3 text-xs focus:outline-none focus:border-[#FF1E56]">
-          <button onclick="handleMobileSearch()" class="bg-gradient-to-r from-[#FF1E56] to-[#FF5376] text-white px-4 py-2 rounded-r-full text-xs">
+            class="w-full bg-[#162227] border border-slate-700 text-white rounded-l-full py-2 pl-4 pr-3 text-xs focus:outline-none focus:border-[#E10000]">
+          <button onclick="handleMobileSearch()" class="bg-gradient-to-r from-[#E10000] to-[#FFAA7C] text-white px-4 py-2 rounded-r-full text-xs">
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>
         </div>
@@ -131,13 +129,13 @@
 
       <!-- Left Hero Text -->
       <div class="lg:w-7/12 space-y-6 text-center lg:text-left">
-        <div data-reveal="up" class="inline-flex items-center gap-2 bg-gradient-to-r from-rose-100 to-emerald-100 text-[#FF1E56] border border-rose-300/80 text-xs font-black px-4 py-1.5 rounded-full shadow-sm">
+        <div data-reveal="up" class="inline-flex items-center gap-2 bg-gradient-to-r from-rose-100 to-emerald-100 text-[#E10000] border border-rose-300/80 text-xs font-black px-4 py-1.5 rounded-full shadow-sm">
           <i class="fa-solid fa-sparkles text-xs"></i> Curated Lifestyle & Tech Finds
         </div>
 
         <h1 data-reveal="up" data-delay="100" class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-[1.12] tracking-tight">
           Little finds.<br>
-          <span class="bg-gradient-to-r from-[#FF1E56] via-[#FF5376] to-[#10B981] bg-clip-text text-transparent">
+          <span class="bg-gradient-to-r from-[#E10000] via-[#FFAA7C] to-[#A0EE73] bg-clip-text text-transparent">
             Big everyday joy.
           </span>
         </h1>
@@ -164,7 +162,7 @@
           <!-- Glowing Multi-Ring Orbit -->
           <div class="absolute inset-0 rounded-full border-2 border-dashed border-rose-400/50 animate-[spin_30s_linear_infinite]"></div>
           <div class="absolute inset-4 rounded-full border-2 border-emerald-400/40 animate-[spin_20s_linear_infinite_reverse]"></div>
-          <div class="absolute inset-8 bg-gradient-to-tr from-emerald-400 via-rose-400 to-[#FF1E56] rounded-full opacity-80 blur-2xl"></div>
+          <div class="absolute inset-8 bg-gradient-to-tr from-emerald-400 via-rose-400 to-[#E10000] rounded-full opacity-80 blur-2xl"></div>
 
           <!-- Dedicated 3D Interactive Logo Emblem (Drag to spin in 3D!) -->
           <div id="hero3DLogoContainer" class="relative z-10 bg-[#0B1315] rounded-3xl p-3 shadow-2xl border-2 border-rose-500/40 flex flex-col items-center justify-center w-56 h-56 sm:w-64 sm:h-64 cursor-grab active:cursor-grabbing group select-none">
@@ -212,35 +210,15 @@
     </div>
   </section>
 
-  <!-- ================= ANIMATED STATS SECTION ================= -->
-  <section class="stats-section" aria-label="Store statistics">
-    <div class="stat-item" data-reveal="up" data-delay="100">
-      <div class="stat-number" data-count="500">0</div>
-      <div class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Happy Customers</div>
-    </div>
-    <div class="stat-item" data-reveal="up" data-delay="200">
-      <div class="stat-number" data-count="150">0</div>
-      <div class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Curated Finds</div>
-    </div>
-    <div class="stat-item" data-reveal="up" data-delay="300">
-      <div class="stat-number" data-count="64">0</div>
-      <div class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Districts Covered</div>
-    </div>
-    <div class="stat-item" data-reveal="up" data-delay="400">
-      <div class="stat-number" data-count="99">0</div>
-      <div class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Satisfaction Rate %</div>
-    </div>
-  </section>
-
   <!-- ================= SHOP BY CATEGORY SECTION ================= -->
   <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full" id="categories-section">
     <div class="flex items-end justify-between mb-6" data-reveal="up">
       <div>
-        <span class="text-[#FF1E56] text-xs font-black uppercase tracking-wider block mb-1">Explore Departments</span>
+        <span class="text-[#E10000] text-xs font-black uppercase tracking-wider block mb-1">Explore Departments</span>
         <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Shop by Category</h2>
-        <div class="w-12 h-1 bg-gradient-to-r from-[#FF1E56] to-[#10B981] rounded-full mt-2"></div>
+        <div class="w-12 h-1 bg-gradient-to-r from-[#E10000] to-[#A0EE73] rounded-full mt-2"></div>
       </div>
-      <a href="#catalog-section" onclick="selectCategory('all'); return false;" class="text-xs font-bold text-[#FF1E56] hover:underline flex items-center gap-1">
+      <a href="#catalog-section" onclick="selectCategory('all'); return false;" class="text-xs font-bold text-[#E10000] hover:underline flex items-center gap-1">
         View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
       </a>
     </div>
@@ -254,9 +232,9 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full" id="catalog-section">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-rose-200/60 pb-4" data-reveal="up">
       <div>
-        <span class="text-[#FF1E56] text-xs font-black uppercase tracking-wider block mb-1">Our Collection</span>
+        <span class="text-[#E10000] text-xs font-black uppercase tracking-wider block mb-1">Our Collection</span>
         <h3 id="currentCategoryTitle" class="text-2xl sm:text-3xl font-black text-slate-900">Popular Products</h3>
-        <div class="w-12 h-1 bg-gradient-to-r from-[#FF1E56] to-[#10B981] rounded-full mt-2"></div>
+        <div class="w-12 h-1 bg-gradient-to-r from-[#E10000] to-[#A0EE73] rounded-full mt-2"></div>
       </div>
 
       <div id="categoryFilterPills" class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -268,7 +246,7 @@
       <p id="resultCount" role="status" aria-live="polite" class="font-bold">Loading the collection…</p>
       <label for="productSort" class="flex items-center gap-2 font-bold">
         Sort by:
-        <select id="productSort" class="bg-white border border-rose-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 font-bold focus:outline-none focus:border-[#FF1E56]">
+        <select id="productSort" class="bg-white border border-rose-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 font-bold focus:outline-none focus:border-[#E10000]">
           <option value="featured">Featured</option>
           <option value="price-low">Price: Low to High</option>
           <option value="price-high">Price: High to Low</option>
@@ -287,7 +265,7 @@
     <div class="bg-white rounded-3xl max-w-4xl w-full overflow-hidden shadow-2xl relative flex flex-col md:flex-row max-h-[92vh] border border-rose-200">
 
       <!-- Close Button -->
-      <button onclick="closeProductModal()" class="absolute top-4 right-4 z-30 bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-[#FF1E56] rounded-full w-9 h-9 flex items-center justify-center transition cursor-pointer">
+      <button onclick="closeProductModal()" class="absolute top-4 right-4 z-30 bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-[#E10000] rounded-full w-9 h-9 flex items-center justify-center transition cursor-pointer">
         <i class="fa-solid fa-xmark text-lg"></i>
       </button>
 
@@ -312,7 +290,7 @@
       <div class="md:w-1/2 p-6 flex flex-col justify-between overflow-y-auto space-y-4">
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <span id="modalCategoryBadge" class="inline-block bg-rose-100 text-[#FF1E56] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider"></span>
+            <span id="modalCategoryBadge" class="inline-block bg-rose-100 text-[#E10000] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider"></span>
             <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
               <i class="fa-solid fa-circle-check mr-1"></i> Quality Checked
             </span>
@@ -322,9 +300,9 @@
 
           <!-- Price & Discounts -->
           <div class="flex items-baseline gap-3 my-2">
-            <span id="modalDiscountPrice" class="text-2xl sm:text-3xl font-black text-[#FF1E56]"></span>
+            <span id="modalDiscountPrice" class="text-2xl sm:text-3xl font-black text-[#E10000]"></span>
             <span id="modalOriginalPrice" class="text-sm line-through text-slate-400 font-bold"></span>
-            <span id="modalDiscountPercent" class="text-xs font-black bg-rose-100 text-[#FF1E56] px-2 py-0.5 rounded-md"></span>
+            <span id="modalDiscountPercent" class="text-xs font-black bg-rose-100 text-[#E10000] px-2 py-0.5 rounded-md"></span>
           </div>
 
           <div id="modalStockStatus" class="mb-3"></div>
@@ -333,9 +311,9 @@
           <div id="modalColorSection" class="border-t border-slate-100 pt-3 hidden">
             <div class="flex items-center justify-between mb-2">
               <label class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                <i class="fa-solid fa-palette text-[#FF1E56]"></i> Available Colors:
+                <i class="fa-solid fa-palette text-[#E10000]"></i> Available Colors:
               </label>
-              <span id="selectedColorName" class="text-xs font-black text-[#FF1E56]"></span>
+              <span id="selectedColorName" class="text-xs font-black text-[#E10000]"></span>
             </div>
             <div id="modalColorSwatches" class="color-swatch-group flex flex-wrap gap-2"></div>
           </div>
@@ -344,9 +322,9 @@
           <div id="modalSizeSection" class="border-t border-slate-100 pt-3 hidden">
             <div class="flex items-center justify-between mb-2">
               <label class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                <i class="fa-solid fa-ruler-combined text-[#10B981]"></i> Select Size:
+                <i class="fa-solid fa-ruler-combined text-[#A0EE73]"></i> Select Size:
               </label>
-              <span id="selectedSizeName" class="text-xs font-black text-[#10B981]"></span>
+              <span id="selectedSizeName" class="text-xs font-black text-[#A0EE73]"></span>
             </div>
             <div id="modalSizePills" class="flex flex-wrap gap-2"></div>
           </div>
@@ -354,11 +332,11 @@
           <!-- PRODUCT PERSONALIZATION / CUSTOMIZATION -->
           <div class="border-t border-slate-100 pt-3">
             <label class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center justify-between mb-1.5">
-              <span><i class="fa-solid fa-wand-magic-sparkles text-[#10B981] mr-1"></i> Custom Engraving / Gift Note (Optional):</span>
+              <span><i class="fa-solid fa-wand-magic-sparkles text-[#A0EE73] mr-1"></i> Custom Engraving / Gift Note (Optional):</span>
               <span class="text-[10px] font-normal text-slate-400">Complimentary</span>
             </label>
             <input type="text" id="modalCustomText" placeholder="e.g. Special gift for Fahim or custom request..."
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-[#FF1E56] transition">
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-[#E10000] transition">
           </div>
 
           <!-- Product Overview Description -->
@@ -425,7 +403,7 @@
       <div class="p-5 bg-[#0B1315] text-white flex justify-between items-center border-b border-rose-500/30">
         <div>
           <h3 class="text-lg font-bold flex items-center gap-2">
-            <i class="fa-solid fa-shield-check text-[#FF1E56]"></i> Complete Your Order
+            <i class="fa-solid fa-shield-check text-[#E10000]"></i> Complete Your Order
           </h3>
           <p class="text-xs text-slate-400 mt-0.5">Pay delivery charge in advance via bKash & book with Cash on Delivery</p>
         </div>
@@ -438,38 +416,38 @@
         <div>
           <label class="block font-bold text-slate-700 uppercase mb-1">Full Name *</label>
           <input type="text" id="custName" required placeholder="e.g. Tanvir Hasan"
-            class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-[#FF1E56]">
+            class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-[#E10000]">
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 uppercase mb-1">Contact Phone Number *</label>
           <input type="tel" id="custPhone" required placeholder="01XXXXXXXXX"
-            class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-[#FF1E56]">
+            class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-[#E10000]">
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 uppercase mb-1">Full Delivery Address *</label>
           <textarea id="custAddress" required rows="2" placeholder="House, Road, Thana, District..."
-            class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-[#FF1E56]"></textarea>
+            class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-[#E10000]"></textarea>
         </div>
 
         <!-- Delivery Location Radio Options -->
         <div class="border-t border-slate-200 pt-3">
           <label class="block font-bold text-slate-700 uppercase mb-2">Step 1: Select Delivery Location *</label>
           <div class="grid grid-cols-2 gap-3">
-            <label class="flex items-center gap-3 p-3.5 border rounded-2xl cursor-pointer hover:border-[#FF1E56] transition bg-slate-50">
-              <input type="radio" name="deliveryLocation" value="inside" checked onchange="setDeliveryLocation('inside')" class="accent-[#FF1E56] h-4 w-4">
+            <label class="flex items-center gap-3 p-3.5 border rounded-2xl cursor-pointer hover:border-[#E10000] transition bg-slate-50">
+              <input type="radio" name="deliveryLocation" value="inside" checked onchange="setDeliveryLocation('inside')" class="accent-[#E10000] h-4 w-4">
               <div>
                 <p class="text-sm font-bold text-slate-800">Inside Dhaka</p>
-                <p class="text-xs text-[#FF1E56] font-semibold">Fee: ৳ <span id="labelFeeInside">60</span></p>
+                <p class="text-xs text-[#E10000] font-semibold">Fee: ৳ <span id="labelFeeInside">60</span></p>
               </div>
             </label>
 
-            <label class="flex items-center gap-3 p-3.5 border rounded-2xl cursor-pointer hover:border-[#FF1E56] transition bg-slate-50">
-              <input type="radio" name="deliveryLocation" value="outside" onchange="setDeliveryLocation('outside')" class="accent-[#FF1E56] h-4 w-4">
+            <label class="flex items-center gap-3 p-3.5 border rounded-2xl cursor-pointer hover:border-[#E10000] transition bg-slate-50">
+              <input type="radio" name="deliveryLocation" value="outside" onchange="setDeliveryLocation('outside')" class="accent-[#E10000] h-4 w-4">
               <div>
                 <p class="text-sm font-bold text-slate-800">Outside Dhaka</p>
-                <p class="text-xs text-[#FF1E56] font-semibold">Fee: ৳ <span id="labelFeeOutside">120</span></p>
+                <p class="text-xs text-[#E10000] font-semibold">Fee: ৳ <span id="labelFeeOutside">120</span></p>
               </div>
             </label>
           </div>
@@ -527,7 +505,7 @@
           </div>
           <div class="flex justify-between text-slate-800 font-bold px-1 border-t border-slate-200 pt-2 text-sm">
             <span>Due on Delivery (COD):</span>
-            <span id="checkoutCodPayable" class="text-[#FF1E56] font-black">৳ 0</span>
+            <span id="checkoutCodPayable" class="text-[#E10000] font-black">৳ 0</span>
           </div>
         </div>
 
@@ -552,8 +530,8 @@
 
       <div class="bg-rose-50/50 p-4 rounded-2xl border border-dashed border-rose-300">
         <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Your Order ID</span>
-        <p id="successOrderId" class="text-2xl font-black text-[#FF1E56] tracking-wider font-mono select-all"></p>
-        <button onclick="copySuccessOrderId()" class="mt-2 text-xs text-slate-600 hover:text-[#FF1E56] font-bold inline-flex items-center gap-1.5 transition cursor-pointer">
+        <p id="successOrderId" class="text-2xl font-black text-[#E10000] tracking-wider font-mono select-all"></p>
+        <button onclick="copySuccessOrderId()" class="mt-2 text-xs text-slate-600 hover:text-[#E10000] font-bold inline-flex items-center gap-1.5 transition cursor-pointer">
           <i class="fa-regular fa-copy"></i> Copy Order ID
         </button>
       </div>
@@ -574,7 +552,7 @@
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-rose-200">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-          <i class="fa-solid fa-truck-ramp-box text-[#FF1E56]"></i> Track Order Status
+          <i class="fa-solid fa-truck-ramp-box text-[#E10000]"></i> Track Order Status
         </h3>
         <button onclick="closeTrackModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
           <i class="fa-solid fa-xmark text-xl"></i>
@@ -584,7 +562,7 @@
       <div class="space-y-3">
         <div class="flex gap-2">
           <input type="text" id="trackInput" placeholder="Enter Order ID (e.g. DB-102938) or Phone"
-            class="flex-1 border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-[#FF1E56]">
+            class="flex-1 border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-[#E10000]">
           <button onclick="handleTrackSearch()" class="wm-btn-jelly px-4 py-2 text-xs">
             Track
           </button>
@@ -604,7 +582,7 @@
         <div class="space-y-4" data-reveal="up" data-delay="100">
           <div class="flex items-center gap-2">
             <img src="delibuy-logo.jpeg" alt="DeliBuy" class="h-12 w-auto rounded-xl border border-rose-500/40">
-            <span class="text-lg font-black text-white">Deli<span class="text-[#FF1E56]">Buy</span></span>
+            <span class="text-lg font-black text-white">Deli<span class="text-[#E10000]">Buy</span></span>
           </div>
           <p class="text-xs text-slate-400 leading-relaxed">
             Curated lifestyle and tech gear with interactive previews, customizable options, and nationwide delivery.
@@ -622,16 +600,16 @@
         </div>
 
         <div data-reveal="up" data-delay="200">
-          <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-[#FF1E56] pl-2">Navigation</h4>
+          <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-[#E10000] pl-2">Navigation</h4>
           <ul class="space-y-2 text-xs">
-            <li><a href="#" onclick="selectCategory('all'); return false;" class="hover:text-[#FF1E56] transition">All Products</a></li>
-            <li><a href="#catalog-section" class="hover:text-[#FF1E56] transition">Shop Collection</a></li>
-            <li><a href="#" onclick="openTrackModal(); return false;" class="hover:text-[#FF1E56] transition">Track Order</a></li>
+            <li><a href="#" onclick="selectCategory('all'); return false;" class="hover:text-[#E10000] transition">All Products</a></li>
+            <li><a href="#catalog-section" class="hover:text-[#E10000] transition">Shop Collection</a></li>
+            <li><a href="#" onclick="openTrackModal(); return false;" class="hover:text-[#E10000] transition">Track Order</a></li>
           </ul>
         </div>
 
         <div data-reveal="up" data-delay="300">
-          <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-[#10B981] pl-2">Payment Policy</h4>
+          <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-[#A0EE73] pl-2">Payment Policy</h4>
           <div class="space-y-2 text-xs">
             <div class="flex flex-wrap gap-2">
               <span class="bg-[#E2136E] text-white px-2.5 py-1 rounded font-bold">bKash (Advance Fee)</span>
@@ -641,14 +619,14 @@
         </div>
 
         <div data-reveal="up" data-delay="400">
-          <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-[#FF1E56] pl-2">Contact Us</h4>
+          <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-[#E10000] pl-2">Contact Us</h4>
           <ul class="space-y-2.5 text-xs text-slate-400">
             <li class="flex items-start gap-2">
-              <i class="fa-solid fa-location-dot text-[#FF1E56] mt-0.5"></i>
+              <i class="fa-solid fa-location-dot text-[#E10000] mt-0.5"></i>
               <span>Bank Town, Savar, Dhaka, Bangladesh, 1347</span>
             </li>
             <li class="flex items-center gap-2">
-              <i class="fa-solid fa-phone text-[#10B981]"></i>
+              <i class="fa-solid fa-phone text-[#A0EE73]"></i>
               <a href="tel:01516597972" class="hover:text-white font-mono">01516-597972</a>
             </li>
           </ul>
@@ -658,7 +636,7 @@
       <div class="border-t border-slate-800/80 mt-10 pt-6 text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2" data-reveal="fade">
         <p>© 2026 DeliBuy. All rights reserved.</p>
         <p class="font-medium">
-          Developed by <span class="text-[#FF1E56] font-bold">KOFS</span>
+          Developed by <span class="text-[#E10000] font-bold">KOFS</span>
         </p>
       </div>
     </div>

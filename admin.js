@@ -1,7 +1,7 @@
 
 // ================= COLOR & SIZE VARIANTS CONTROLLER =================
 
-function addColorRow(type, data = { name: '', code: '#FF1E56', stock: 10 }) {
+function addColorRow(type, data = { name: '', code: '#E10000', stock: 10 }) {
   const container = document.getElementById(type === 'add' ? 'addColorsContainer' : 'editColorsContainer');
   if (!container) return;
 
@@ -10,7 +10,7 @@ function addColorRow(type, data = { name: '', code: '#FF1E56', stock: 10 }) {
   row.id = rowId;
   row.className = 'flex items-center gap-2 p-2 bg-white rounded-xl border border-rose-100 shadow-2xs';
   row.innerHTML = `
-    <input type="color" value="${data.code || '#FF1E56'}" class="w-8 h-8 rounded-lg cursor-pointer border-0 p-0 bg-transparent shrink-0">
+    <input type="color" value="${data.code || '#E10000'}" class="w-8 h-8 rounded-lg cursor-pointer border-0 p-0 bg-transparent shrink-0">
     <input type="text" placeholder="Color Name (e.g. Ruby Red)" value="${data.name || ''}" class="flex-1 border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-brand-orange">
     <div class="flex items-center gap-1 shrink-0">
       <span class="text-[10px] text-slate-400 font-bold">Qty:</span>
@@ -58,7 +58,7 @@ function collectFormVariants(type) {
   const colors = [];
   if (colorContainer) {
     colorContainer.querySelectorAll('div[id^="color_row_"]').forEach(row => {
-      const code = row.querySelector('input[type="color"]')?.value || '#FF1E56';
+      const code = row.querySelector('input[type="color"]')?.value || '#E10000';
       const name = row.querySelector('input[type="text"]')?.value.trim() || 'Custom Color';
       const stock = parseInt(row.querySelector('input[type="number"]')?.value) || 0;
       colors.push({ name, code, stock });
@@ -84,6 +84,30 @@ function collectFormVariants(type) {
  */
 
 const API_BASE = 'https://delibuy.onrender.com/api';
+
+function getAdminToken() {
+  return sessionStorage.getItem('delibuy_admin_token') || '';
+}
+
+async function adminFetch(url, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {})
+  };
+  const token = getAdminToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  const res = await fetch(url, { ...options, headers });
+  if (res.status === 401) {
+    sessionStorage.removeItem('delibuy_logged_admin');
+  sessionStorage.removeItem('delibuy_admin_token');
+    sessionStorage.removeItem('delibuy_admin_token');
+    document.getElementById('adminLoginOverlay')?.classList.remove('hidden');
+  }
+  return res;
+}
+
 
 let currentOrderFilter = 'All';
 let currentUploadedImages = [];
@@ -165,6 +189,7 @@ async function handleAdminLogin(e) {
     const data = await res.json();
     if (res.ok && data.success) {
       sessionStorage.setItem('delibuy_logged_admin', JSON.stringify(data.admin));
+      if (data.token) sessionStorage.setItem('delibuy_admin_token', data.token);
       loggedAdmin = data.admin;
       document.getElementById('adminLoginOverlay')?.classList.add('hidden');
       applyRoleBasedPermissions();
@@ -237,7 +262,7 @@ function switchTab(tabId) {
 // ================= ORDERS WITH CANCEL AT EVERY STAGE =================
 async function loadOrders() {
   try {
-    const res = await fetch(`${API_BASE}/orders`);
+    const res = await adminFetch(`${API_BASE}/orders`);
     if (res.ok) {
       allOrders = await res.json();
       updateOrderStats();
@@ -370,7 +395,7 @@ function getActionButtons(o) {
 async function updateOrderStatus(orderId, newStatus) {
   if (!confirm(`Are you sure you want to change this order status to "${newStatus}"?`)) return;
   try {
-    const res = await fetch(`${API_BASE}/orders/${orderId}/status`, {
+    const res = await adminFetch(`${API_BASE}/orders/${orderId}/status`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: newStatus })
@@ -455,7 +480,7 @@ function openOrderDetailModal(orderId) { currentInspectedOrder = allOrders.find(
                   ` : ''}
                   ${item.color ? `
                     <span class="inline-flex items-center gap-1 text-[9px] font-black bg-rose-50 text-slate-800 px-2 py-0.5 rounded-md border border-rose-200">
-                      <span class="w-2 h-2 rounded-full inline-block shadow-xs" style="background:${item.color.code || item.color.hex || '#FF1E56'}"></span>
+                      <span class="w-2 h-2 rounded-full inline-block shadow-xs" style="background:${item.color.code || item.color.hex || '#E10000'}"></span>
                       ${item.color.name}
                     </span>
                   ` : ''}
@@ -665,7 +690,7 @@ async function handleCreateProduct(e) {
   };
 
   try {
-    const res = await fetch(`${API_BASE}/products`, {
+    const res = await adminFetch(`${API_BASE}/products`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newProd)
@@ -799,7 +824,7 @@ async function handleUpdateProduct(e) {
   };
 
   try {
-    const res = await fetch(`${API_BASE}/products/${id}`, {
+    const res = await adminFetch(`${API_BASE}/products/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedData)
@@ -820,7 +845,7 @@ async function handleUpdateProduct(e) {
 async function handleDeleteProduct(productId) {
   if (!confirm('Are you sure you want to delete this product?')) return;
   try {
-    const res = await fetch(`${API_BASE}/products/${productId}`, { method: 'DELETE' });
+    const res = await adminFetch(`${API_BASE}/products/${productId}`, { method: 'DELETE' });
     if (res.ok) {
       await loadProducts();
     }
@@ -829,7 +854,8 @@ async function handleDeleteProduct(productId) {
   }
 }
 
-// ================= CATEGORIES LOGIC =================
+
+// ================= CATEGORIES LOGIC (FULL ADMIN AUTHORITY) =================
 async function loadCategories() {
   try {
     const res = await fetch(`${API_BASE}/categories`);
@@ -845,43 +871,134 @@ async function loadCategories() {
 
 function populateCategoryDropdowns() {
   const addSelect = document.getElementById('prodCategorySelect');
-  if (addSelect) {
-    addSelect.innerHTML = allCategories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-  }
+  const editSelect = document.getElementById('editProdCategorySelect');
+  const options = allCategories.length === 0
+    ? '<option value="">No categories yet (Click + New Category)</option>'
+    : allCategories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  
+  if (addSelect) addSelect.innerHTML = options;
+  if (editSelect) editSelect.innerHTML = options;
 }
 
 function renderAdminCategories() {
   const grid = document.getElementById('adminCategoryGrid');
   if (!grid) return;
-  grid.innerHTML = allCategories.map(c => `
-    <div class="flex items-center justify-between p-3.5 bg-slate-50 border rounded-2xl">
-      <div>
-        <p class="font-bold text-xs text-slate-900">${c.name}</p>
-        <span class="text-[10px] font-mono text-slate-400">ID: ${c.id}</span>
+
+  if (!allCategories || allCategories.length === 0) {
+    grid.innerHTML = `
+      <div class="col-span-full py-10 text-center bg-slate-50 border border-dashed border-slate-200 rounded-2xl p-6">
+        <i class="fa-solid fa-shapes text-3xl text-slate-300 mb-2"></i>
+        <p class="font-bold text-xs text-slate-700">No categories found in store.</p>
+        <p class="text-[11px] text-slate-400 mt-0.5">You have full authority to create custom categories that suit your products using the form above.</p>
       </div>
-      <button onclick="handleDeleteCategory('${c.id}')" class="text-red-500 hover:text-red-700 text-xs font-bold p-1 cursor-pointer">
-        <i class="fa-solid fa-trash-can"></i>
-      </button>
+    `;
+    return;
+  }
+
+  grid.innerHTML = allCategories.map(c => `
+    <div class="flex items-center justify-between p-3.5 bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:border-brand-orange/40 transition">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-8 h-8 rounded-xl bg-orange-50 text-brand-orange flex items-center justify-center shrink-0 text-xs">
+          <i class="fa-solid ${c.icon || 'fa-tag'}"></i>
+        </div>
+        <div class="min-w-0">
+          <p class="font-bold text-xs text-slate-900 truncate">${c.name}</p>
+          <span class="text-[10px] font-mono text-slate-400">ID: ${c.id}</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-1 shrink-0">
+        <button onclick="openEditCategoryModal('${c.id}')" class="text-blue-600 hover:text-blue-800 p-1.5 rounded-lg hover:bg-blue-50 transition cursor-pointer" title="Edit Category">
+          <i class="fa-solid fa-pen-to-square text-xs"></i>
+        </button>
+        <button onclick="handleDeleteCategory('${c.id}')" class="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition cursor-pointer" title="Delete Category">
+          <i class="fa-solid fa-trash-can text-xs"></i>
+        </button>
+      </div>
     </div>
   `).join('');
 }
 
 async function handleCreateCategory(e) {
   e.preventDefault();
-  const name = document.getElementById('newCatName').value.trim();
-  const id = document.getElementById('newCatId').value.trim().toLowerCase();
+  const nameInput = document.getElementById('newCatName');
+  const idInput = document.getElementById('newCatId');
+  const name = nameInput ? nameInput.value.trim() : '';
+  let id = idInput ? idInput.value.trim().toLowerCase() : '';
+
+  if (!name) {
+    alert('Please enter a Category Title.');
+    return;
+  }
+
+  if (!id) {
+    id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Create Category';
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Creating...';
+  }
 
   try {
-    const res = await fetch(`${API_BASE}/categories`, {
+    const res = await adminFetch(`${API_BASE}/categories`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, id })
+      body: JSON.stringify({ name, id, icon: 'fa-tag' })
     });
+    const data = await res.json();
     if (res.ok) {
       document.getElementById('addCategoryForm')?.reset();
+      if (idInput) delete idInput.dataset.manual;
       await loadCategories();
+      alert(`Category "${name}" created successfully!`);
     } else {
-      alert('Failed to create category.');
+      alert(data.error || 'Failed to create category.');
+    }
+  } catch (err) {
+    alert('Server error creating category. Please check your connection.');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
+    }
+  }
+}
+
+function openEditCategoryModal(catId) {
+  const cat = allCategories.find(c => c.id === catId);
+  if (!cat) return;
+  document.getElementById('editCatOriginalId').value = cat.id;
+  document.getElementById('editCatName').value = cat.name;
+  document.getElementById('editCatId').value = cat.id;
+  document.getElementById('editCatIcon').value = cat.icon || 'fa-tag';
+  document.getElementById('editCategoryModal')?.classList.remove('hidden');
+}
+
+function closeEditCategoryModal() {
+  document.getElementById('editCategoryModal')?.classList.add('hidden');
+}
+
+async function handleUpdateCategory(e) {
+  e.preventDefault();
+  const oldId = document.getElementById('editCatOriginalId').value;
+  const name = document.getElementById('editCatName').value.trim();
+  const newId = document.getElementById('editCatId').value.trim().toLowerCase();
+  const icon = document.getElementById('editCatIcon').value.trim() || 'fa-tag';
+
+  try {
+    const res = await adminFetch(`${API_BASE}/categories/${oldId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ name, newId, icon })
+    });
+    if (res.ok) {
+      closeEditCategoryModal();
+      await loadCategories();
+      await loadProducts();
+      alert('Category updated successfully!');
+    } else {
+      const data = await res.json();
+      alert(data.error || 'Failed to update category.');
     }
   } catch (err) {
     alert('Server error.');
@@ -891,13 +1008,58 @@ async function handleCreateCategory(e) {
 async function handleDeleteCategory(catId) {
   if (!confirm(`Delete category "${catId}"?`)) return;
   try {
-    const res = await fetch(`${API_BASE}/categories/${catId}`, { method: 'DELETE' });
-    if (res.ok) await loadCategories();
+    const res = await adminFetch(`${API_BASE}/categories/${catId}`, { method: 'DELETE' });
+    if (res.ok) {
+      await loadCategories();
+      await loadProducts();
+    } else {
+      alert('Failed to delete category.');
+    }
   } catch (err) {
     alert('Server error.');
   }
 }
 
+async function handleClearAllCategories() {
+  if (!confirm('Are you sure you want to remove ALL existing categories?\nThis will clear all categories so you can start completely fresh.')) return;
+  try {
+    const res = await adminFetch(`${API_BASE}/categories-clear-all`, { method: 'DELETE' });
+    if (res.ok) {
+      await loadCategories();
+      alert('All existing categories have been cleared. You now have full authority to add your own categories!');
+    } else {
+      alert('Could not clear categories.');
+    }
+  } catch (err) {
+    alert('Server error.');
+  }
+}
+
+async function quickPromptNewCategory(formType) {
+  const title = prompt('Enter new Category Name (e.g. Traditional Panjabi):');
+  if (!title || !title.trim()) return;
+  const autoSlug = title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const slug = prompt('Enter Category Slug ID:', autoSlug);
+  if (!slug || !slug.trim()) return;
+
+  try {
+    const res = await adminFetch(`${API_BASE}/categories`, {
+      method: 'POST',
+      body: JSON.stringify({ name: title.trim(), id: slug.trim(), icon: 'fa-tag' })
+    });
+    if (res.ok) {
+      await loadCategories();
+      const selectId = formType === 'add' ? 'prodCategorySelect' : 'editProdCategorySelect';
+      const select = document.getElementById(selectId);
+      if (select) select.value = slug.trim();
+    } else {
+      const data = await res.json();
+      alert(data.error || 'Failed to create category.');
+    }
+  } catch (err) {
+    alert('Server error.');
+  }
+}
 // ================= STORE SETTINGS =================
 async function loadSettings() {
   try {
@@ -923,7 +1085,7 @@ async function handleSaveSettings(e) {
   const outsideDhakaFee = parseFloat(document.getElementById('settingOutsideFee').value);
 
   try {
-    const res = await fetch(`${API_BASE}/settings`, {
+    const res = await adminFetch(`${API_BASE}/settings`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ bkashNumber, insideDhakaFee, outsideDhakaFee })
@@ -941,7 +1103,7 @@ async function handleSaveSettings(e) {
 // ================= ADMIN CREDENTIALS & AUTO-STAFF GENERATOR =================
 async function loadAdminAccounts() {
   try {
-    const res = await fetch(`${API_BASE}/admins`);
+    const res = await adminFetch(`${API_BASE}/admins`);
     if (res.ok) {
       const admins = await res.json();
       renderAdminAccounts(admins);
@@ -991,7 +1153,7 @@ async function handleChangeOwnCredentials(e) {
   const newPassword = document.getElementById('newPassword').value.trim();
 
   try {
-    const res = await fetch(`${API_BASE}/admin/change-credentials`, {
+    const res = await adminFetch(`${API_BASE}/admin/change-credentials`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1021,7 +1183,7 @@ async function handleCreateNewAdmin(e) {
   const role = document.getElementById('newStaffRole').value;
 
   try {
-    const res = await fetch(`${API_BASE}/admins`, {
+    const res = await adminFetch(`${API_BASE}/admins`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, username, password, role })
@@ -1041,7 +1203,7 @@ async function handleCreateNewAdmin(e) {
 async function handleDeleteAdmin(username) {
   if (!confirm(`Delete staff account "${username}"?`)) return;
   try {
-    const res = await fetch(`${API_BASE}/admins/${username}`, { method: 'DELETE' });
+    const res = await adminFetch(`${API_BASE}/admins/${username}`, { method: 'DELETE' });
     if (res.ok) await loadAdminAccounts();
   } catch (err) {
     alert('Server error.');

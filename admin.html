@@ -16,17 +16,17 @@
         extend: {
           colors: {
             brand: {
-              orange: '#FF1E56', pink: '#FF3B69', rind: '#10B981',
+              orange: '#E10000', pink: '#FFAA7C', rind: '#A0EE73',
               dark: '#0B0F19',
-              light: '#FFF5EB',
+              light: '#FFEDCC',
             },
             editorial: {
-              bg: '#F7F5F2',
+              bg: '#FFFDF9',
               card: '#FFFFFF',
-              border: '#E8E4DE',
+              border: '#EFE6D8',
               muted: '#A09B93',
               ink: '#1A1A1A',
-              subtle: '#F2F0ED',
+              subtle: '#FDF7EC',
             }
           },
           fontFamily: {
@@ -44,14 +44,14 @@
        PREMIUM EDITORIAL ADMIN THEME
        ================================================================ */
     :root {
-      --ed-bg: #F7F5F2;
+      --ed-bg: #FFFDF9;
       --ed-card: #FFFFFF;
-      --ed-border: #E8E4DE;
+      --ed-border: #EFE6D8;
       --ed-muted: #A09B93;
       --ed-ink: #1A1A1A;
-      --ed-subtle: #F2F0ED;
-      --ed-accent: #FF1E56;
-      --ed-accent-soft: #FFF0F3;
+      --ed-subtle: #FDF7EC;
+      --ed-accent: #E10000;
+      --ed-accent-soft: rgba(255, 170, 124, 0.16);
       --ed-sidebar: #101820;
     }
 
@@ -112,7 +112,7 @@
     .ed-stat-card:nth-child(1)::before { background: #F59E0B; }
     .ed-stat-card:nth-child(2)::before { background: #3B82F6; }
     .ed-stat-card:nth-child(3)::before { background: #8B5CF6; }
-    .ed-stat-card:nth-child(4)::before { background: #10B981; }
+    .ed-stat-card:nth-child(4)::before { background: #A0EE73; }
     .ed-stat-card:nth-child(5)::before { background: #EF4444; }
 
     /* ── TABLE REFINEMENT ── */
@@ -424,6 +424,72 @@
       <!-- ================= TAB 1: DASHBOARD & ORDERS ================= -->
       <section id="dashboardTab" class="admin-tab space-y-6">
 
+        <!-- ================= MONEY EARNED & REVENUE PERFORMANCE ================= -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          
+          <!-- Realized Cash from Delivered Orders -->
+          <div class="ed-card p-5 bg-gradient-to-br from-emerald-500/10 via-white to-emerald-50/50 border-2 border-emerald-500/30 shadow-xs relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-black uppercase tracking-wider text-emerald-900">Money Earned (Delivered)</span>
+              <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs font-black shadow-xs">
+                ৳
+              </div>
+            </div>
+            <p id="statTotalEarned" class="text-3xl sm:text-4xl font-black text-emerald-700 mt-2 font-editorial">৳ 0</p>
+            <div class="flex items-center justify-between mt-2 pt-2 border-t border-emerald-100 text-[11px]">
+              <span class="text-emerald-700 font-bold"><i class="fa-solid fa-circle-check mr-1"></i>Completed:</span>
+              <span id="statDeliveredCountMini" class="font-black text-slate-800">0 orders</span>
+            </div>
+          </div>
+
+          <!-- Money In Transit (Shipped to Courier) -->
+          <div class="ed-card p-5 bg-gradient-to-br from-blue-500/10 via-white to-blue-50/50 border border-blue-200 shadow-xs relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-black uppercase tracking-wider text-blue-900">In Courier Transit</span>
+              <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs shadow-xs">
+                <i class="fa-solid fa-truck-fast"></i>
+              </div>
+            </div>
+            <p id="statShippedRevenue" class="text-3xl sm:text-4xl font-black text-blue-700 mt-2 font-editorial">৳ 0</p>
+            <div class="flex items-center justify-between mt-2 pt-2 border-t border-blue-100 text-[11px]">
+              <span class="text-blue-700 font-bold"><i class="fa-solid fa-boxes-packing mr-1"></i>On the Road:</span>
+              <span id="statShippedCountMini" class="font-black text-slate-800">0 orders</span>
+            </div>
+          </div>
+
+          <!-- Gross Sales Volume (All Non-Cancelled Bookings) -->
+          <div class="ed-card p-5 bg-gradient-to-br from-rose-500/10 via-white to-rose-50/50 border border-rose-200 shadow-xs relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-black uppercase tracking-wider text-rose-900">Total Sales Booked</span>
+              <div class="w-8 h-8 rounded-xl bg-[#E10000] text-white flex items-center justify-center text-xs shadow-xs">
+                <i class="fa-solid fa-chart-line"></i>
+              </div>
+            </div>
+            <p id="statGrossRevenue" class="text-3xl sm:text-4xl font-black text-[#E10000] mt-2 font-editorial">৳ 0</p>
+            <div class="flex items-center justify-between mt-2 pt-2 border-t border-rose-100 text-[11px]">
+              <span class="text-rose-700 font-bold"><i class="fa-solid fa-cart-shopping mr-1"></i>Active Orders:</span>
+              <span id="statActiveOrdersCountMini" class="font-black text-slate-800">0 orders</span>
+            </div>
+          </div>
+
+          <!-- Total Items Sold -->
+          <div class="ed-card p-5 bg-gradient-to-br from-amber-500/10 via-white to-amber-50/50 border border-amber-200 shadow-xs relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-black uppercase tracking-wider text-amber-900">Total Items Sold</span>
+              <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xs shadow-xs">
+                <i class="fa-solid fa-cubes-stacked"></i>
+              </div>
+            </div>
+            <p id="statTotalItemsSold" class="text-3xl sm:text-4xl font-black text-amber-700 mt-2 font-editorial">0 pcs</p>
+            <div class="flex items-center justify-between mt-2 pt-2 border-t border-amber-100 text-[11px]">
+              <span class="text-amber-700 font-bold"><i class="fa-solid fa-receipt mr-1"></i>Average Ticket:</span>
+              <span id="statAvgOrderValue" class="font-black text-slate-800">৳ 0</span>
+            </div>
+          </div>
+
+        </div>
+
+
         <!-- Stats Row -->
         <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
           <div onclick="filterOrdersByStatus('Order Placed')" class="ed-card ed-stat-card p-5">
@@ -516,7 +582,7 @@
                 <input type="text" id="prodTitle" required class="ed-input">
               </div>
               <div>
-                <label class="ed-label">Category *</label>
+                <div class="flex items-center justify-between"><label class="ed-label">Category *</label><button type="button" onclick="quickPromptNewCategory('add')" class="text-[10px] text-brand-orange hover:underline font-bold cursor-pointer">+ New Category</button></div>
                 <select id="prodCategorySelect" required class="ed-input"></select>
               </div>
             </div>
@@ -638,14 +704,25 @@
             <h2 class="ed-section-title text-base">Add New Category</h2>
           </div>
           <form id="addCategoryForm" onsubmit="handleCreateCategory(event)" class="flex flex-col sm:flex-row gap-3">
-            <input type="text" id="newCatName" required placeholder="Category Title" class="ed-input flex-1">
-            <input type="text" id="newCatId" required placeholder="Unique ID (e.g. watch)" class="ed-input w-full sm:w-48 font-mono">
-            <button type="submit" class="ed-btn-primary shrink-0">Create Category</button>
+            <input type="text" id="newCatName" required
+              oninput="if(!document.getElementById('newCatId').dataset.manual) document.getElementById('newCatId').value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')"
+              placeholder="Category Title (e.g. Traditional Panjabi, Shoes, Watches)" class="ed-input flex-1">
+            <input type="text" id="newCatId"
+              oninput="this.dataset.manual = 'true'"
+              placeholder="Unique ID / Slug (Auto-generated)" class="ed-input w-full sm:w-60 font-mono">
+            <button type="submit" class="ed-btn-primary shrink-0 flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-plus text-xs"></i> Create Category
+            </button>
           </form>
         </div>
 
         <div class="ed-card p-5">
-          <h3 class="ed-section-title text-sm mb-4">Active Categories</h3>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="ed-section-title text-sm">Active Categories</h3>
+            <button type="button" onclick="handleClearAllCategories()" class="text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-trash-can"></i> Clear All Categories
+            </button>
+          </div>
           <div id="adminCategoryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
         </div>
       </section>
@@ -794,7 +871,7 @@
             <input type="text" id="editProdTitle" required class="ed-input">
           </div>
           <div>
-            <label class="ed-label">Category *</label>
+            <div class="flex items-center justify-between"><label class="ed-label">Category *</label><button type="button" onclick="quickPromptNewCategory('edit')" class="text-[10px] text-brand-orange hover:underline font-bold cursor-pointer">+ New Category</button></div>
             <select id="editProdCategorySelect" required class="ed-input"></select>
           </div>
         </div>
@@ -951,6 +1028,40 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  
+  <!-- ================= EDIT CATEGORY MODAL ================= -->
+  <div id="editCategoryModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="ed-card max-w-md w-full overflow-hidden p-6 ed-modal-content space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-base text-editorial-ink flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-brand-orange"></i> Edit Category
+        </h3>
+        <button onclick="closeEditCategoryModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <form id="editCategoryForm" onsubmit="handleUpdateCategory(event)" class="space-y-3">
+        <input type="hidden" id="editCatOriginalId">
+        <div>
+          <label class="ed-label">Category Title *</label>
+          <input type="text" id="editCatName" required class="ed-input">
+        </div>
+        <div>
+          <label class="ed-label">Category Slug / Unique ID *</label>
+          <input type="text" id="editCatId" required class="ed-input font-mono">
+        </div>
+        <div>
+          <label class="ed-label">Icon Class (FontAwesome, e.g. fa-shirt, fa-tag)</label>
+          <input type="text" id="editCatIcon" class="ed-input font-mono" placeholder="fa-tag">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeEditCategoryModal()" class="ed-btn-secondary px-4 py-2 text-xs">Cancel</button>
+          <button type="submit" class="ed-btn-primary px-4 py-2 text-xs">Save Changes</button>
+        </div>
+      </form>
     </div>
   </div>
 

@@ -1,27 +1,27 @@
 /* ============================================================
    🍉 DELIBUY — WATERMELON UI & 3D INTERACTIVE DESIGN SYSTEM
-   Palette: Juicy Watermelon Crimson (#FF1E56, #FF3B69),
-            Fresh Mint Rind (#10B981, #059669, #34D399),
+   Palette: Juicy Watermelon Crimson (#E10000, #FFAA7C),
+            Fresh Mint Rind (#A0EE73, #76CD42, #B8F296),
             Crisp Cream (#FFFDF8),
             Deep Seed Charcoal (#091014, #111923)
    ============================================================ */
 
 :root {
-  --wm-pink: #FF1E56;
-  --wm-pink-glow: rgba(255, 30, 86, 0.35);
-  --wm-coral: #FF5376;
-  --wm-rind: #10B981;
-  --wm-rind-dark: #059669;
+  --wm-pink: #E10000;
+  --wm-pink-glow: rgba(225, 0, 0, 0.35);
+  --wm-coral: #FFAA7C;
+  --wm-rind: #A0EE73;
+  --wm-rind-dark: #76CD42;
   --wm-rind-deep: #022C22;
-  --wm-rind-glow: rgba(16, 185, 129, 0.35);
-  --wm-cream: #FFFDF8;
+  --wm-rind-glow: rgba(160, 238, 115, 0.35);
+  --wm-cream: #FFEDCC;
   --wm-seed: #0B1315;
   --wm-glass: rgba(255, 255, 255, 0.85);
   --wm-glass-border: rgba(255, 255, 255, 0.6);
-  --wm-mesh: radial-gradient(at 10% 20%, rgba(255, 30, 86, 0.12) 0px, transparent 50%),
-             radial-gradient(at 90% 10%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
-             radial-gradient(at 50% 80%, rgba(255, 180, 195, 0.2) 0px, transparent 60%),
-             #FFFDF8;
+  --wm-mesh: radial-gradient(at 10% 20%, rgba(225, 0, 0, 0.10) 0px, transparent 50%),
+             radial-gradient(at 90% 10%, rgba(160, 238, 115, 0.16) 0px, transparent 50%),
+             radial-gradient(at 50% 80%, rgba(255, 170, 124, 0.18) 0px, transparent 60%),
+             #FFFDF9;
 }
 
 html {
@@ -44,7 +44,7 @@ body {
   left: 0;
   height: 4px;
   width: 0%;
-  background: linear-gradient(90deg, #FF1E56, #FF5376, #34D399, #10B981);
+  background: linear-gradient(90deg, #E10000, #FFAA7C, #B8F296, #A0EE73);
   box-shadow: 0 0 12px var(--wm-pink-glow);
   z-index: 1000;
   transition: width 0.08s linear;
@@ -61,20 +61,20 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: 24px;
   box-shadow: 0 10px 35px -5px rgba(2, 44, 34, 0.05),
-              0 2px 10px rgba(255, 30, 86, 0.03);
+              0 2px 10px rgba(225, 0, 0, 0.03);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .wm-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 45px -10px rgba(255, 30, 86, 0.18),
+  box-shadow: 0 20px 45px -10px rgba(225, 0, 0, 0.18),
               0 0 0 1px rgba(255, 83, 118, 0.3);
 }
 
 /* Neon Jelly Button */
 .wm-btn-jelly {
   position: relative;
-  background: linear-gradient(135deg, #FF1E56 0%, #FF5376 100%);
+  background: linear-gradient(135deg, #E10000 0%, #FFAA7C 100%);
   color: white;
   font-weight: 800;
   border-radius: 9999px;
@@ -106,7 +106,7 @@ body {
 
 .wm-btn-jelly:hover {
   transform: scale(1.05) translateY(-2px);
-  box-shadow: 0 14px 32px rgba(255, 30, 86, 0.45);
+  box-shadow: 0 14px 32px rgba(225, 0, 0, 0.45);
 }
 
 .wm-btn-jelly:active {
@@ -115,13 +115,13 @@ body {
 
 /* Mint Rind Secondary Button */
 .wm-btn-mint {
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  background: linear-gradient(135deg, #A0EE73 0%, #76CD42 100%);
   color: white;
   box-shadow: 0 8px 25px var(--wm-rind-glow);
 }
 
 .wm-btn-mint:hover {
-  box-shadow: 0 14px 32px rgba(16, 185, 129, 0.45);
+  box-shadow: 0 14px 32px rgba(160, 238, 115, 0.45);
 }
 
 /* ============================================================
@@ -232,7 +232,7 @@ body {
 
 .color-swatch.active {
   transform: scale(1.25);
-  box-shadow: 0 0 0 3px #FF1E56, 0 6px 15px rgba(255, 30, 86, 0.35);
+  box-shadow: 0 0 0 3px #E10000, 0 6px 15px rgba(225, 0, 0, 0.35);
 }
 
 .color-swatch.active::after {
@@ -259,8 +259,8 @@ body {
   object-fit: contain;
   background: white;
   padding: 6px;
-  border: 2px solid #FF1E56;
-  box-shadow: 0 10px 30px rgba(255, 30, 86, 0.6), 0 0 20px #FF5376;
+  border: 2px solid #E10000;
+  box-shadow: 0 10px 30px rgba(225, 0, 0, 0.6), 0 0 20px #FFAA7C;
   transition: all 0.75s cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 
@@ -281,8 +281,8 @@ body {
    ============================================================ */
 #store-hero {
   position: relative;
-  background: radial-gradient(ellipse at 85% 25%, rgba(255, 30, 86, 0.18) 0%, transparent 50%),
-              radial-gradient(ellipse at 15% 85%, rgba(16, 185, 129, 0.22) 0%, transparent 55%),
+  background: radial-gradient(ellipse at 85% 25%, rgba(225, 0, 0, 0.18) 0%, transparent 50%),
+              radial-gradient(ellipse at 15% 85%, rgba(160, 238, 115, 0.22) 0%, transparent 55%),
               linear-gradient(180deg, #FFFDF8 0%, #FFF5F7 100%);
   padding-top: 80px;
   padding-bottom: 80px;
@@ -294,7 +294,7 @@ body {
   width: 480px;
   height: 480px;
   border-radius: 50%;
-  background: conic-gradient(from 180deg at 50% 50%, #FF1E56 0deg, #FF5376 120deg, #10B981 240deg, #34D399 300deg, #FF1E56 360deg);
+  background: conic-gradient(from 180deg at 50% 50%, #E10000 0deg, #FFAA7C 120deg, #A0EE73 240deg, #B8F296 300deg, #E10000 360deg);
   filter: blur(80px);
   opacity: 0.35;
   animation: floatOrb 12s ease-in-out infinite alternate;
@@ -347,10 +347,10 @@ body {
   place-items: center;
   border-radius: 16px;
   background: #FFF0F3;
-  color: #FF1E56;
+  color: #E10000;
   font-size: 20px;
   flex-shrink: 0;
-  box-shadow: 0 6px 16px rgba(255, 30, 86, 0.15);
+  box-shadow: 0 6px 16px rgba(225, 0, 0, 0.15);
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -360,8 +360,8 @@ body {
 
 .service-strip > div:nth-child(2) i {
   background: #ECFDF5;
-  color: #10B981;
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.15);
+  color: #A0EE73;
+  box-shadow: 0 6px 16px rgba(160, 238, 115, 0.15);
 }
 
 .service-strip > div:nth-child(3) i {
@@ -398,13 +398,13 @@ body {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #FF1E56, #10B981);
+  background: linear-gradient(90deg, #E10000, #A0EE73);
 }
 
 .stat-number {
   font-size: 2.2rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #FF1E56 0%, #FF5376 60%, #10B981 100%);
+  background: linear-gradient(135deg, #E10000 0%, #FFAA7C 60%, #A0EE73 100%);
   -webkit-background-clip: text;
   color: transparent;
   line-height: 1;
@@ -426,8 +426,8 @@ body {
 
 .product-card:hover {
   transform: translateY(-8px);
-  border-color: rgba(255, 30, 86, 0.3);
-  box-shadow: 0 20px 40px -10px rgba(255, 30, 86, 0.16),
+  border-color: rgba(225, 0, 0, 0.3);
+  box-shadow: 0 20px 40px -10px rgba(225, 0, 0, 0.16),
               0 0 0 1px rgba(255, 83, 118, 0.2);
 }
 
@@ -447,7 +447,7 @@ body {
 
 /* Custom Watermelon Badge */
 .wm-badge {
-  background: linear-gradient(135deg, #FF1E56 0%, #FF5376 100%);
+  background: linear-gradient(135deg, #E10000 0%, #FFAA7C 100%);
   color: white;
   font-weight: 800;
   font-size: 11px;
@@ -457,7 +457,7 @@ body {
 }
 
 .wm-badge-mint {
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  background: linear-gradient(135deg, #A0EE73 0%, #76CD42 100%);
   box-shadow: 0 4px 12px var(--wm-rind-glow);
 }
 
@@ -491,9 +491,9 @@ body {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #FF1E56, #10B981);
+  background: linear-gradient(135deg, #E10000, #A0EE73);
   color: white;
-  box-shadow: 0 10px 25px rgba(255, 30, 86, 0.35);
+  box-shadow: 0 10px 25px rgba(225, 0, 0, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -512,7 +512,7 @@ body {
 
 .back-to-top:hover {
   transform: translateY(-4px) scale(1.1);
-  box-shadow: 0 15px 35px rgba(255, 30, 86, 0.5);
+  box-shadow: 0 15px 35px rgba(225, 0, 0, 0.5);
 }
 
 /* Reduced Motion */
@@ -568,17 +568,17 @@ body {
 }
 
 .size-pill:hover:not(:disabled) {
-  border-color: #10B981;
-  color: #10B981;
+  border-color: #A0EE73;
+  color: #A0EE73;
   background: #ECFDF5;
   transform: translateY(-1px);
 }
 
 .size-pill.active {
-  border-color: #10B981;
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  border-color: #A0EE73;
+  background: linear-gradient(135deg, #A0EE73 0%, #76CD42 100%);
   color: white;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 4px 14px rgba(160, 238, 115, 0.35);
 }
 
 .size-pill:disabled, .size-pill.out-of-stock {
@@ -596,9 +596,9 @@ body {
 }
 
 .color-swatch-item.active {
-  border-color: #FF1E56 !important;
+  border-color: #E10000 !important;
   background: #FFF1F4 !important;
-  color: #FF1E56 !important;
-  box-shadow: 0 0 0 1px #FF1E56, 0 4px 12px rgba(255, 30, 86, 0.15);
+  color: #E10000 !important;
+  box-shadow: 0 0 0 1px #E10000, 0 4px 12px rgba(225, 0, 0, 0.15);
 }
 

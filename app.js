@@ -80,11 +80,11 @@ function initHero3DLogo() {
   keyLight.position.set(4, 5, 5);
   heroScene.add(keyLight);
 
-  const crimsonRim = new THREE.DirectionalLight(0xff1e56, 1.2);
+  const crimsonRim = new THREE.DirectionalLight(0xe10000, 1.2);
   crimsonRim.position.set(-4, -2, -2);
   heroScene.add(crimsonRim);
 
-  const mintRim = new THREE.DirectionalLight(0x10b981, 0.9);
+  const mintRim = new THREE.DirectionalLight(0xa0ee73, 0.9);
   mintRim.position.set(0, -4, 3);
   heroScene.add(mintRim);
 
@@ -127,7 +127,7 @@ function initHero3DLogo() {
     // Glowing Neon Ring beneath logo
     const ringGeo = new THREE.TorusGeometry(1.35, 0.035, 16, 64);
     const ringMat = new THREE.MeshBasicMaterial({
-      color: 0xff1e56,
+      color: 0xe10000,
       transparent: true,
       opacity: 0.75
     });
@@ -138,7 +138,7 @@ function initHero3DLogo() {
   }, undefined, () => {
     // Fallback metallic emblem
     const geometry = new THREE.BoxGeometry(1.8, 1.8, 0.3);
-    const material = new THREE.MeshStandardMaterial({ color: 0xff1e56, roughness: 0.3, metalness: 0.7 });
+    const material = new THREE.MeshStandardMaterial({ color: 0xe10000, roughness: 0.3, metalness: 0.7 });
     heroLogoMesh = new THREE.Mesh(geometry, material);
     heroLogoGroup.add(heroLogoMesh);
   });
@@ -315,7 +315,7 @@ function triggerFlyToCartAnimation(startElement, imageSrc) {
           x: (endRect.left + endRect.width / 2) / window.innerWidth,
           y: (endRect.top + endRect.height / 2) / window.innerHeight
         },
-        colors: ['#FF1E56', '#10B981', '#FF5376', '#34D399', '#FFFFFF']
+        colors: ['#E10000', '#A0EE73', '#FFAA7C', '#B8F296', '#FFFFFF']
       });
     }
   }, 750);
@@ -479,10 +479,10 @@ function renderCategoryCards() {
       <button type="button" onclick="selectCategory('${cat.id}')"
         data-reveal="up" data-delay="${(idx + 1) * 80}"
         class="wm-card p-4 rounded-3xl flex flex-col items-center text-center group cursor-pointer transition">
-        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-100 to-emerald-100 group-hover:from-[#FF1E56] group-hover:to-[#10B981] text-[#FF1E56] group-hover:text-white flex items-center justify-center text-xl mb-2.5 transition shadow-sm">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-100 to-emerald-100 group-hover:from-[#E10000] group-hover:to-[#A0EE73] text-[#E10000] group-hover:text-white flex items-center justify-center text-xl mb-2.5 transition shadow-sm">
           <i class="${icon}"></i>
         </div>
-        <h4 class="font-extrabold text-xs text-slate-800 group-hover:text-[#FF1E56] transition">${cat.name}</h4>
+        <h4 class="font-extrabold text-xs text-slate-800 group-hover:text-[#E10000] transition">${cat.name}</h4>
         <span class="text-[10px] text-slate-400 mt-0.5">Explore <i class="fa-solid fa-arrow-right text-[8px]" aria-hidden="true"></i></span>
       </button>
     `;
@@ -495,10 +495,11 @@ function renderCategoryFilterPills() {
   const container = document.getElementById('categoryFilterPills');
   if (!container) return;
 
-  container.innerHTML = categories.map(cat => `
+  const displayCategories = categories.some(c => c.id === 'all') ? categories : [{ id: 'all', name: 'All Products' }, ...categories];
+  container.innerHTML = displayCategories.map(cat => `
     <button onclick="selectCategory('${cat.id}')" class="px-4 py-1.5 rounded-full text-xs font-black transition whitespace-nowrap cursor-pointer ${
       activeCategory === cat.id
-      ? 'bg-gradient-to-r from-[#FF1E56] to-[#FF5376] text-white shadow-lg shadow-rose-300'
+      ? 'bg-gradient-to-r from-[#E10000] to-[#FFAA7C] text-white shadow-lg shadow-rose-300'
       : 'bg-white text-slate-600 hover:bg-rose-50 border border-rose-100'
     }">
       ${cat.name}
@@ -577,11 +578,11 @@ function renderProducts() {
         <!-- Discount & Featured Badges -->
         <div class="absolute top-3 left-3 z-10 flex flex-col gap-1.5 items-start">
           ${hasDiscount ? `
-            <span class="bg-[#10B981] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm">
+            <span class="bg-[#A0EE73] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm">
               ${discountPercent}% OFF
             </span>
           ` : `
-            <span class="bg-rose-100 text-[#FF1E56] text-[10px] font-black px-2 py-0.5 rounded-full border border-rose-200">
+            <span class="bg-rose-100 text-[#E10000] text-[10px] font-black px-2 py-0.5 rounded-full border border-rose-200">
               Featured
             </span>
           `}
@@ -606,14 +607,14 @@ function renderProducts() {
         <div class="p-4 flex-1 flex flex-col justify-between">
           <div class="mb-3">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">${p.category}</span>
-            <h3 onclick="openProductModal('${p._id}')" class="font-extrabold text-sm text-slate-900 line-clamp-2 hover:text-[#FF1E56] cursor-pointer transition leading-snug">
+            <h3 onclick="openProductModal('${p._id}')" class="font-extrabold text-sm text-slate-900 line-clamp-2 hover:text-[#E10000] cursor-pointer transition leading-snug">
               ${p.name}
             </h3>
           </div>
 
           <div class="flex items-end justify-between pt-2.5 border-t border-slate-100">
             <div>
-              <span class="text-base font-black text-[#FF1E56] block leading-tight">৳ ${(p.discountPrice || 0).toLocaleString()}</span>
+              <span class="text-base font-black text-[#E10000] block leading-tight">৳ ${(p.discountPrice || 0).toLocaleString()}</span>
               ${hasDiscount ? `
                 <span class="text-[11px] line-through text-slate-400 font-medium">৳ ${(p.originalPrice || 0).toLocaleString()}</span>
               ` : ''}
@@ -621,7 +622,7 @@ function renderProducts() {
 
             <!-- Add to Cart with Fly Animation -->
             <button aria-label="Add to cart" onclick="event.stopPropagation(); handleDirectAddToCart('${p._id}', this)" ${isOutOfStock ? 'disabled' : ''}
-              class="w-10 h-10 rounded-full ${isOutOfStock ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-gradient-to-tr from-[#FF1E56] to-[#FF5376] text-white hover:scale-110 active:scale-90 shadow-md shadow-rose-300'} flex items-center justify-center transition cursor-pointer">
+              class="w-10 h-10 rounded-full ${isOutOfStock ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-gradient-to-tr from-[#E10000] to-[#FFAA7C] text-white hover:scale-110 active:scale-90 shadow-md shadow-rose-300'} flex items-center justify-center transition cursor-pointer">
               <i class="fa-solid fa-cart-shopping text-xs"></i>
             </button>
           </div>
@@ -678,7 +679,7 @@ function openProductModal(productId) {
   const thumbContainer = document.getElementById('modalThumbnails');
   if (thumbContainer) {
     thumbContainer.innerHTML = images.map((src, idx) => `
-      <button onclick="selectModalImage('${src}', this)" class="w-12 h-12 rounded-xl border-2 overflow-hidden bg-white p-1 transition cursor-pointer ${idx === 0 ? 'border-[#FF1E56] shadow-md' : 'border-slate-200 opacity-70 hover:opacity-100'}">
+      <button onclick="selectModalImage('${src}', this)" class="w-12 h-12 rounded-xl border-2 overflow-hidden bg-white p-1 transition cursor-pointer ${idx === 0 ? 'border-[#E10000] shadow-md' : 'border-slate-200 opacity-70 hover:opacity-100'}">
         <img src="${src}" class="w-full h-full object-contain">
       </button>
     `).join('');
@@ -693,12 +694,12 @@ function openProductModal(productId) {
     currentSelectedColor = prod.colors[0];
     if (colorLabel) {
       colorLabel.innerText = currentSelectedColor.name;
-      colorLabel.style.color = currentSelectedColor.code || '#FF1E56';
+      colorLabel.style.color = currentSelectedColor.code || '#E10000';
     }
     colorSwatches.innerHTML = prod.colors.map((c, i) => `
       <button type="button" onclick="selectModalColor('${encodeURIComponent(JSON.stringify(c))}', this)"
         class="color-swatch-item ${i === 0 ? 'active' : ''} flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:border-rose-400 transition cursor-pointer text-xs font-bold text-slate-700">
-        <span class="w-3.5 h-3.5 rounded-full inline-block shadow-xs" style="background:${c.code || '#FF1E56'};"></span>
+        <span class="w-3.5 h-3.5 rounded-full inline-block shadow-xs" style="background:${c.code || '#E10000'};"></span>
         <span>${c.name}</span>
         ${c.stock !== undefined ? `<span class="text-[10px] text-slate-400 font-normal">(${c.stock})</span>` : ''}
       </button>
@@ -746,7 +747,7 @@ function selectModalColor(colorJsonStr, btn) {
   const colorLabel = document.getElementById('selectedColorName');
   if (colorLabel) {
     colorLabel.innerText = color.name;
-    colorLabel.style.color = color.code || '#FF1E56';
+    colorLabel.style.color = color.code || '#E10000';
   }
   document.querySelectorAll('#modalColorSwatches button').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
@@ -758,7 +759,7 @@ function selectModalColor(colorJsonStr, btn) {
       particleCount: 16,
       spread: 40,
       origin: { y: 0.65 },
-      colors: [color.code || '#FF1E56', '#FFFFFF', '#10B981']
+      colors: [color.code || '#E10000', '#FFFFFF', '#A0EE73']
     });
   }
 }
@@ -811,11 +812,11 @@ function selectModalImage(src, btn) {
   if (mainImg) mainImg.src = src;
 
   document.querySelectorAll('#modalThumbnails button').forEach(b => {
-    b.classList.remove('border-[#FF1E56]', 'shadow-md');
+    b.classList.remove('border-[#E10000]', 'shadow-md');
     b.classList.add('border-slate-200', 'opacity-70');
   });
   if (btn) {
-    btn.classList.add('border-[#FF1E56]', 'shadow-md');
+    btn.classList.add('border-[#E10000]', 'shadow-md');
     btn.classList.remove('border-slate-200', 'opacity-70');
   }
 }
@@ -963,7 +964,7 @@ function updateCartUI() {
             <div class="flex flex-wrap items-center gap-1.5 my-1">
               ${item.color ? `
                 <span class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-600 bg-white px-2 py-0.5 rounded-md border border-slate-200">
-                  <span class="w-2.5 h-2.5 rounded-full inline-block" style="background:${item.color.code || item.color.hex || '#FF1E56'}"></span>
+                  <span class="w-2.5 h-2.5 rounded-full inline-block" style="background:${item.color.code || item.color.hex || '#E10000'}"></span>
                   ${item.color.name}
                 </span>
               ` : ''}
@@ -973,12 +974,12 @@ function updateCartUI() {
                 </span>
               ` : ''}
               ${item.customization ? `
-                <span class="text-[10px] text-[#10B981] font-bold bg-emerald-50 px-2 py-0.5 rounded-md truncate max-w-[120px]">
+                <span class="text-[10px] text-[#A0EE73] font-bold bg-emerald-50 px-2 py-0.5 rounded-md truncate max-w-[120px]">
                   ✍️ ${item.customization}
                 </span>
               ` : ''}
             </div>
-            <span class="text-[#FF1E56] font-black text-xs">৳ ${item.price.toLocaleString()}</span>
+            <span class="text-[#E10000] font-black text-xs">৳ ${item.price.toLocaleString()}</span>
           </div>
 
           <div class="flex items-center gap-1 bg-white border rounded-xl p-1">
@@ -1099,7 +1100,7 @@ async function handlePlaceOrder(e) {
           particleCount: 120,
           spread: 90,
           origin: { y: 0.5 },
-          colors: ['#FF1E56', '#10B981', '#FF5376', '#34D399', '#F59E0B']
+          colors: ['#E10000', '#A0EE73', '#FFAA7C', '#B8F296', '#F59E0B']
         });
       }
     } else {
@@ -1170,7 +1171,7 @@ async function handleTrackSearch() {
       resBox.innerHTML = `
         <div class="p-4 bg-rose-50/50 border border-rose-100 rounded-2xl space-y-2 text-xs text-left">
           <div class="flex justify-between items-center border-b border-rose-100 pb-2">
-            <span class="font-mono font-black text-[#FF1E56] text-sm">${ord.orderId}</span>
+            <span class="font-mono font-black text-[#E10000] text-sm">${ord.orderId}</span>
             <span class="px-2.5 py-1 rounded-full font-black text-[10px] ${getStatusClass(ord.status)}">${ord.status}</span>
           </div>
           <p><strong>Customer:</strong> ${ord.customer?.name || 'N/A'}</p>
